@@ -1,0 +1,104 @@
+body {
+	background-color: rgb(125, 204, 88);
+}
+
+/* General aka main box*/
+.container {
+	display: flex;
+	/* Changes the direction of placement, 
+    from horizontal to vertical placement */
+	flex-direction: column;
+	align-items: center; /* Aligns at the center*/
+
+	width: 100%;
+	height: 100%;
+	/* Inherit the background color of its father*/
+	background-color: inherit;
+}
+
+/* Identification Box style. Is used to create the 
+    login menu*/
+.ident-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	background-color: rgb(240, 236, 41);
+
+	border: mediumaquamarine 5px solid;
+	box-shadow: 5px 10px rgb(68, 145, 79);
+
+	min-width: 65%;
+
+	margin: 2%;
+
+	color: rgb(68, 145, 79);
+}
+
+/* Login Pass box. Its used to get input from the user
+    namely login and password*/
+.user-pass {
+	display: flex;
+	flex-direction: column;
+	background-color: inherit;
+	width: 50%;
+	align-items: center;
+}
+
+/* Button Style. Style for buttons*/
+.button {
+	background-color: rgb(125, 204, 88);
+	width: 100px;
+	height: 25px;
+	border: solid 2px rgb(68, 145, 79);
+	padding: 10px;
+	margin: 10px;
+	cursor: pointer;
+}
+
+.button p {
+	margin: auto;
+	color: rgb(240, 236, 41);
+	text-align: center;
+	vertical-align: middle;
+	font-size: large;
+	font-family: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
+}
+
+/* When the mouse hovers the button, it will change 
+    the background color*/
+.button:hover {
+	background-color: mediumaquamarine;
+}
+
+/* Input style inside user-pass Box*/
+.user-pass input {
+	color: rgb(68, 145, 79);
+	overflow: auto;
+	margin: 10px;
+	border: solid 2px rgb(68, 145, 79);
+}
+
+.user-pass input:focus {
+	outline: 2px rgb(68, 145, 79);
+}
+
+/* Image Box style. Defines a box that contains an image*/
+.image-holder {
+	width: 150px;
+	height: auto;
+	border: 3px solid mediumaquamarine;
+	box-shadow: 5px 10px rgb(68, 145, 79);
+	margin: 2%;
+}
+
+.image-holder img {
+	width: 100%;
+	height: auto;
+	/* We need to align at the bottom or else the image
+    height and box height won't match. I don't know 
+    exact reason. LookUP!!*/
+	vertical-align: bottom;
+	margin: 0px;
+	padding: 0px;
+}
