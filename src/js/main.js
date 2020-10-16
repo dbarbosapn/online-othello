@@ -9,13 +9,8 @@
  *      5 - End Game
  */
 
-/* I have changed the way we keep track of the current page
-    in order for us to go back to the previous pages.
-    I think its a usefull function and its going to show
-    its "weight" in the instruction manual and score page*/
 var memPanel = [0];
 
-// Instruction manual have several pages, but i dont want to have it in memory(memPanel)
 var curInst = 3;
 
 const configuration = {
@@ -24,16 +19,16 @@ const configuration = {
     aiDifficulty: "easy",
 }
 
-window.onload = function () {
+window.onload = function() {
     setupAuthentication();
     setupConfiguration();
-    setupInstruction();
+    setupInstructions();
 }
 
 function setupAuthentication() {
     let button = document.getElementById("auth-button");
 
-    button.onclick = function () {
+    button.onclick = function() {
         switchPanel(1);
     }
 }
@@ -44,15 +39,15 @@ function setupConfiguration() {
     let vsPlayer = document.getElementById("vs-player");
     let aiDifficultySection = document.getElementById("ai-difficulty-section");
 
-    vsAi.onchange = function () {
+    vsAi.onchange = function() {
         aiDifficultySection.style.display = "flex";
     }
 
-    vsPlayer.onchange = function () {
+    vsPlayer.onchange = function() {
         aiDifficultySection.style.display = "none";
     }
 
-    button.onclick = function () {
+    button.onclick = function() {
         if (vsAi.checked) configuration.gameType = "ai";
         else configuration.gameType = "player";
 
@@ -65,33 +60,33 @@ function setupConfiguration() {
     }
 }
 
-function setupInstruction(){
+function setupInstructions() {
     let instButton = document.getElementById("inst-button");
     let nextButton = document.getElementById("inst-next");
     let prevButton = document.getElementById("inst-prev");
 
-    instButton.onclick = function (){
+    instButton.onclick = function() {
         switchPanel(2);
 
         curInst = 3;
         showPanel(curInst);
 
-        for( let i = 4; i < 6; i++ )
+        for (let i = 4; i < 6; i++)
             hidePanel(i);
     }
 
-    nextButton.onclick = function (){
+    nextButton.onclick = function() {
         nextInst();
     }
 
-    prevButton.onclick = function(){
+    prevButton.onclick = function() {
         prevInst();
     }
 
 }
 
-function curPanel(){
-    return memPanel[memPanel.length-1];
+function curPanel() {
+    return memPanel[memPanel.length - 1];
 }
 
 function switchPanel(newPanel) {
@@ -100,21 +95,19 @@ function switchPanel(newPanel) {
     memPanel.push(newPanel);
 }
 
-function switchPanelBack(){
+function switchPanelBack() {
     hidePanel(memPanel.pop());
     showPanel(curPanel());
 }
 
 /* Functions to traverse instruction manual. Next instruction page
     In case there is no next page we go back to the previous panel*/
-function nextInst(){
-    if ( curInst<5 ){
+function nextInst() {
+    if (curInst < 5) {
         hidePanel(curInst);
-        curInst+=1;
+        curInst += 1;
         showPanel(curInst);
-    }  
-
-    else{
+    } else {
         curInst = 3;
         switchPanelBack();
     }
@@ -122,15 +115,13 @@ function nextInst(){
 
 /* Previous instruction page. In case there is bo previous page
     we go to the previous panel*/
-function prevInst(){
-    if ( curInst <= 3 ){
+function prevInst() {
+    if (curInst <= 3) {
         switchPanelBack();
         curInst = 3;
-    }
-
-    else{
+    } else {
         hidePanel(curInst);
-        curInst-=1;
+        curInst -= 1;
         showPanel(curInst);
     }
 }
@@ -151,7 +142,7 @@ function getBoxName(panel) {
             return "ident-box";
         case 1:
             return "config-box";
-        case 2:  
+        case 2:
             return "inst-box";
         case 3:
             return "inst-box-1";

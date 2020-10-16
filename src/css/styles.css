@@ -57,7 +57,7 @@ body {
 	font-family: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
 }
 
-.mult-button{
+.mult-button {
 	background-color: inherit;
 	display: flex;
 	margin: 2%;
@@ -138,7 +138,7 @@ body {
 }
 
 /* ------ Instructions---------- */
-.text-box{
+.text-box {
 	background-color: inherit;
 	margin-bottom: 3%;
 	padding: 2%;
@@ -146,19 +146,19 @@ body {
 	flex-direction: column;
 }
 
-.text-box h1{
+.text-box h1 {
 	text-align: center;
 	margin: 2%;
 	margin-bottom: 0px;
 	padding: 2%;
 }
 
-.text-box ul{
+.text-box ul {
 	margin: 2%;
 }
 
-.text-box li{
-	color:  #2c3e50;
+.text-box li {
+	color: #2c3e50;
 	margin: 5px;
 	padding: 5px;
 }
