@@ -1,5 +1,7 @@
+/* -------- GENERIC ------------- */
+
 body {
-	background-color: rgb(125, 204, 88);
+	background-color: #34495e;
 }
 
 /* General aka main box*/
@@ -16,24 +18,74 @@ body {
 	background-color: inherit;
 }
 
-/* Identification Box style. Is used to create the 
-    login menu*/
-.ident-box {
+/* Panel Style */
+.panel {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 
-	background-color: rgb(240, 236, 41);
+	background-color: #ecf0f1;
 
-	border: mediumaquamarine 5px solid;
-	box-shadow: 5px 10px rgb(68, 145, 79);
+	border: #e74c3c 5px solid;
+	box-shadow: 5px 10px #2c3e50;
 
 	min-width: 65%;
 
 	margin: 2%;
 
-	color: rgb(68, 145, 79);
+	color: #e74c3c;
+	font-family: sans-serif;
 }
+
+/* Button Style. Style for buttons*/
+.button {
+	background-color: #34495e;
+	width: 100px;
+	height: 25px;
+	border: solid 2px #2c3e50;
+	padding: 10px;
+	margin: 10px;
+	cursor: pointer;
+}
+
+.button p {
+	margin: auto;
+	color: white;
+	text-align: center;
+	vertical-align: middle;
+	font-size: large;
+	font-family: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
+}
+
+/* When the mouse hovers the button, it will change 
+    the background color*/
+.button:hover {
+	background-color: white;
+}
+
+.button:hover p {
+	color: #2c3e50;
+}
+
+/* Image Box style. Defines a box that contains an image*/
+.image-holder {
+	width: 150px;
+	height: auto;
+}
+
+.image-holder img {
+	width: 100%;
+	height: auto;
+}
+
+.image-holder h1 {
+	color: white;
+	text-align: center;
+	font-family: sans-serif;
+	margin-top: -10px;
+}
+
+/* ---------- LOGIN ------------- */
 
 /* Login Pass box. Its used to get input from the user
     namely login and password*/
@@ -45,60 +97,36 @@ body {
 	align-items: center;
 }
 
-/* Button Style. Style for buttons*/
-.button {
-	background-color: rgb(125, 204, 88);
-	width: 100px;
-	height: 25px;
-	border: solid 2px rgb(68, 145, 79);
-	padding: 10px;
-	margin: 10px;
-	cursor: pointer;
-}
-
-.button p {
-	margin: auto;
-	color: rgb(240, 236, 41);
-	text-align: center;
-	vertical-align: middle;
-	font-size: large;
-	font-family: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
-}
-
-/* When the mouse hovers the button, it will change 
-    the background color*/
-.button:hover {
-	background-color: mediumaquamarine;
-}
-
 /* Input style inside user-pass Box*/
 .user-pass input {
-	color: rgb(68, 145, 79);
+	color: #2c3e50;
 	overflow: auto;
 	margin: 10px;
-	border: solid 2px rgb(68, 145, 79);
+	border: solid 2px #2c3e50;
 }
 
 .user-pass input:focus {
-	outline: 2px rgb(68, 145, 79);
+	outline: 2px #2c3e50;
 }
 
-/* Image Box style. Defines a box that contains an image*/
-.image-holder {
-	width: 150px;
-	height: auto;
-	border: 3px solid mediumaquamarine;
-	box-shadow: 5px 10px rgb(68, 145, 79);
-	margin: 2%;
+/* ------ CONFIGURATION ---------- */
+
+.configuration {
+	display: flex;
+	flex-direction: column;
+	background-color: inherit;
+	width: 50%;
+	align-items: center;
+	margin-bottom: 20px;
 }
 
-.image-holder img {
-	width: 100%;
-	height: auto;
-	/* We need to align at the bottom or else the image
-    height and box height won't match. I don't know 
-    exact reason. LookUP!!*/
-	vertical-align: bottom;
-	margin: 0px;
-	padding: 0px;
+.configuration label {
+	color: #2c3e50;
+}
+
+.config-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 20px;
 }
