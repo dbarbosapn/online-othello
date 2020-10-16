@@ -123,7 +123,7 @@ function nextInst(){
 /* Previous instruction page. In case there is bo previous page
     we go to the previous panel*/
 function prevInst(){
-    if ( curInst < 3 ){
+    if ( curInst <= 3 ){
         switchPanelBack();
         curInst = 3;
     }
@@ -161,5 +161,5 @@ function getBoxName(panel) {
             return "inst-box-3";
     }
 
-    return 0;
+    return "";
 }
