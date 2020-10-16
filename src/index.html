@@ -9,20 +9,66 @@
 
     <body>
         <div class="container">
+            <!-- Always Visible -->
             <div class="image-holder center">
-                <img alt="Othelho Image" src="img/Othelho_image.png">
+                <img alt="Othelho Image" src="img/othello.png">
+                <h1>Othello</h1>
             </div>
 
-            <div class="ident-box">
-                <h1>Authentication!</h1>
+            <!-- Login -->
+            <div id="ident-box" class="panel">
+                <h1>Authentication</h1>
 
                 <div class="user-pass">
                     <input type="text" placeholder="Login">
                     <input type="password" placeholder="Password">
                 </div>
 
-                <div class="button">
+                <div class="button" id="auth-button">
                     <p>Enter</p>
+                </div>
+            </div>
+
+            <!-- Configuration -->
+            <div id="config-box" class="panel" style="display: none;">
+                <h1>Configuration</h1>
+            
+                <div class="configuration">
+                    <div class="config-section">
+                        <h3>Game Type</h3>
+                        <label for="vs-ai">
+                            Player vs AI <input type="radio" id="vs-ai" name="game-type" value="ai" checked>
+                        </label>
+                        <br/>
+                        <label for="vs-player">
+                            Player vs Player <input type="radio" id="vs-player" name="game-type" value="player">
+                        </label>
+                    </div>
+
+                    <div class="config-section">
+                        <h3>Player Color</h3>
+                        <label for="color-light">
+                            Light <input type="radio" id="color-light" name="player-color" value="light" checked>
+                        </label>
+                        <br />
+                        <label for="color-dark">
+                            Dark <input type="radio" id="color-dark" name="player-color" value="dark">
+                        </label>
+                    </div>
+
+                    <div class="config-section" id="ai-difficulty-section">
+                        <h3>AI Difficulty</h3>
+                        <select name="ai-difficulty" id="ai-difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="hard">Hard</option>
+                            <option value="hardcore">Hardcore</option>
+                        </select>
+                    </div>
+
+                    <div class="button" id="config-button">
+                        <p>Start Game!</p>
+                    </div>
                 </div>
             </div>
         </div>
