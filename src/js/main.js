@@ -50,7 +50,6 @@ function setupConfiguration() {
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
 
-        console.log(configuration);
         switchPanel(2);
     }
 }
