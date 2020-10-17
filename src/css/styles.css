@@ -44,6 +44,8 @@ body {
 .modal {
 	position: fixed;
 	z-index: 2;
+	max-height: 90%;
+	overflow-y: auto;
 }
 
 #dark-overlay {

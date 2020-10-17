@@ -4,8 +4,8 @@
  * 0 - Authentication
  * 1 - Configuration
  * 2 - Game
- * 3 - Instructions
- * 4 - Highscore
+ * 3 - Instructions (Modal)
+ * 4 - Highscore (Modal)
  */
 var currPanel = 0;
 
@@ -109,6 +109,8 @@ function setupInstructions() {
         instBox1.style.display = "flex";
         instBox2.style.display = "none";
         instBox3.style.display = "none";
+        prevButton.style.display = "none";
+        nextButton.style.display = "block";
         hidePanel(3, true);
     }
 }
