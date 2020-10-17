@@ -134,6 +134,9 @@ function switchPanel(newPanel) {
             hidePanel(i);
     }
 
+    else if ( newPanel == 6 )
+        displayHighScore();
+
     hidePanel(curPanel());
     showPanel(newPanel);
     memPanel.push(newPanel);
@@ -222,7 +225,7 @@ var player = [new HighScore("Enio", "31-12-20", 69),
     a message board or a command feedback*/            
 function displayHighScore() {
     let content = "";
-    player.sort((a, b) => a.score - b.score);
+    player.sort((a, b) => b.score - a.score);
     player.forEach((player) => content += '<tr><td>' + player.name +'</td><td>' + player.date + '</td><td>' + player.score +'</td></tr>');
     document.getElementById("highScore-content").innerHTML = content;
 }
