@@ -20,7 +20,7 @@ body {
 
 /* Panel Style */
 .panel {
-	display: flex;
+	display: none;
 	flex-direction: column;
 	align-items: center;
 
@@ -161,4 +161,32 @@ body {
 	color: #2c3e50;
 	margin: 5px;
 	padding: 5px;
+}
+
+/* HighScore*/
+table {
+	background-color: #ecf0f1;
+	border-collapse: collapse;
+	margin: 3%;
+	min-width: 50%;
+	table-layout: fixed;
+}
+
+table td, th {
+	border: #e74c3c 2px solid;
+	text-align: center;
+	color:  #2c3e50;
+}
+
+/* Mini High Score. To be displayed on game plate*/
+table#type1{
+	width: 150px;
+}
+
+.panel#mini-high-score-box {
+	display: flex;
+	position: fixed;
+	float: right;
+
+	width: 100px;
 }
