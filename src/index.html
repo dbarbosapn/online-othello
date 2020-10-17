@@ -30,7 +30,7 @@
             </div>
 
             <!-- Configuration -->
-            <div id="config-box" class="panel" style="display: none;">
+            <div id="config-box" class="panel" >
                 <h1>Configuration</h1>
             
                 <div class="configuration">
@@ -73,13 +73,16 @@
                         <div class="button" id="config-button">
                             <p>Start Game!</p>
                         </div>
+                        <div class="button" id="highScore-button">
+                            <p>High Score</p>
+                        </div>
                     </div>
                 </div>
             </div>
   
     
             <!-- Instructions -->         
-            <div id="inst-box" class="panel" style="display: none;">
+            <div id="inst-box" class="panel" >
 
                 <div id="inst-box-1" class="text-box">
                     <h1>Game Play</h1>
@@ -99,7 +102,7 @@
                     </ul>
                 </div>
 
-                <div id="inst-box-2" class="text-box" style="display: none;">
+                <div id="inst-box-2" class="text-box" >
                     <h1>Valid Moves</h1>
 
                     <ul>
@@ -114,7 +117,7 @@
                     </ul>
                 </div>
 
-                <div id="inst-box-3" class="text-box" style="display: none;">
+                <div id="inst-box-3" class="text-box" >
                     <h1>End of the Game</h1>
 
                     <ul>
@@ -133,6 +136,31 @@
                     </div>
                 </div>
             </div>     
+
+
+            <!--High Score-->
+            <div class="panel" id="high-score-box" >
+                <h1>High Score</h1>
+                <table>
+                    <thead>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Score</th>
+                    </thead>
+    
+                    <tbody id="highScore-content">
+                    </tbody>
+                </table>   
+
+                <div class="mult-button">
+                    <div class="button" id="back-button-hs">
+                        <p>Back</p>
+                    </div>
+                    <div class="button" id="inst-button-hs">
+                        <p>Instructions</p>
+                    </div>
+                </div>
+            </div>
 
         <script src="js/main.js"></script>
     </body>
