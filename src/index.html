@@ -9,6 +9,9 @@
 
     <body>
         <div class="container">
+
+            <div id="dark-overlay"></div>
+
             <!-- Always Visible -->
             <div class="image-holder center">
                 <img alt="Othelho Image" src="img/othello.png">
@@ -82,10 +85,10 @@
   
     
             <!-- Instructions -->         
-            <div id="inst-box" class="panel" >
+            <div id="inst-box" class="panel modal" >
 
                 <div id="inst-box-1" class="text-box">
-                    <h1>Game Play</h1>
+                    <h1>Gameplay</h1>
 
                     <ul>
                         <li>Othello is a strategy board game played between 2 players. One player plays black and the other plays white.</li>
@@ -135,11 +138,15 @@
                         <p>Next</p>
                     </div>
                 </div>
+
+                <div class="button" id="close-button-inst">
+                    <p>Close</p>
+                </div>
             </div>     
 
 
             <!--High Score-->
-            <div class="panel" id="high-score-box" >
+            <div class="panel modal" id="high-score-box" >
                 <h1>High Score</h1>
                 <table>
                     <thead>
@@ -148,20 +155,15 @@
                         <th>Score</th>
                     </thead>
     
-                    <tbody id="highScore-content">
+                    <tbody id="highscore-content">
                     </tbody>
                 </table>   
 
-                <div class="mult-button">
-                    <div class="button" id="back-button-hs">
-                        <p>Back</p>
-                    </div>
-                    <div class="button" id="inst-button-hs">
-                        <p>Instructions</p>
-                    </div>
+                <div class="button" id="close-button-hs">
+                    <p>Close</p>
                 </div>
             </div>
-
-        <script src="js/main.js"></script>
+            <script src="js/main.js"></script>
+        </div>
     </body>
 </html>
