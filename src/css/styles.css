@@ -98,7 +98,7 @@ body {
 /* Image Box style. Defines a box that contains an image*/
 
 .image-holder {
-	width: 150px;
+	width: 100px;
 	height: auto;
 }
 
@@ -229,26 +229,23 @@ table#type1 {
 	font-family: sans-serif;
 }
 
-#forfeit-flag {
+.bottom-right-button {
 	position: fixed;
 	bottom: 20px;
 	right: 20px;
-	width: 100px;
 	cursor: pointer;
 }
 
-#manual-icon {
+.top-right-button {
 	position: fixed;
 	top: 20px;
 	right: 20px;
-	width: 100px;
 	cursor: pointer;
 }
 
-#ranking-icon {
+.top-left-button {
 	position: fixed;
 	top: 20px;
 	left: 20px;
-	width: 100px;
 	cursor: pointer;
 }

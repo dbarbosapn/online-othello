@@ -7,7 +7,7 @@
  * 3 - Instructions (Modal)
  * 4 - Highscore (Modal)
  */
-var currPanel = 2;
+var currPanel = 0;
 
 var currInstructionBox = 1;
 
