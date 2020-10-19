@@ -23,11 +23,13 @@ window.onload = function() {
     setupConfiguration();
     setupInstructions();
     setupHighScore();
+    setupGame();
+
+    showPanel(currPanel);
 }
 
 function setupAuthentication() {
     let button = document.getElementById("auth-button");
-    showPanel(0);
 
     button.onclick = function() {
         switchPanel(1);
@@ -130,9 +132,23 @@ function setupHighScore() {
     }
 }
 
+function setupGame() {
+    let manual = document.getElementById("manual-icon");
+    let ranking = document.getElementById("ranking-icon");
+
+    manual.onclick = function () {
+        showPanel(3, true);
+    }
+
+    ranking.onclick = function () {
+        showPanel(4, true);
+    }
+}
+
 function switchPanel(newPanel) {
     hidePanel(currPanel);
     showPanel(newPanel);
+    currPanel = newPanel;
 }
 
 function hidePanel(panel, modal = false) {
