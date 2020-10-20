@@ -123,11 +123,12 @@ function setupInstructions() {
         }
     }
 
+    instCurPage = instFirstPage;
+    instSwitchPage(instFirstPage);
+
     /* What to do when a certain reference is clicked on */
     instButton.onclick = function() {
         showPanel(3, true);
-        instCurPage = instFirstPage;
-        instSwitchPage(instFirstPage);
     }
 
     nextButton.onclick = function() {
