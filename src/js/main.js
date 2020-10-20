@@ -6,6 +6,7 @@
  * 2 - Game
  * 3 - Instructions (Modal)
  * 4 - Highscore (Modal)
+ * 5 - Confirmation (Modal)
  */
 var currPanel = 0;
 
@@ -135,6 +136,7 @@ function setupHighScore() {
 function setupGame() {
     let manual = document.getElementById("manual-icon");
     let ranking = document.getElementById("ranking-icon");
+    let forfeit = document.getElementById("forfeit-flag");
 
     manual.onclick = function () {
         showPanel(3, true);
@@ -142,6 +144,12 @@ function setupGame() {
 
     ranking.onclick = function () {
         showPanel(4, true);
+    }
+
+    forfeit.onclick = function () {
+        showConfirmationDialog("Forfeit", "Are you sure you want to forfeit?", function () {
+            alert("You have forfeit!");
+        });
     }
 }
 
@@ -188,7 +196,9 @@ function getBoxName(panel) {
         case 3:
             return "inst-box";
         case 4:
-            return "high-score-box"
+            return "high-score-box";
+        case 5:
+            return "confirmation-dialog";
     }
 
     return "";
@@ -228,4 +238,20 @@ function displayMiniHighScore() {
     });
 
     document.getElementById("mini-highscore-content").innerHTML = content;
+}
+
+function showConfirmationDialog(title, content, onConfirm) {
+    document.getElementById("dialog-title").innerText = title;
+    document.getElementById("dialog-content").innerText = content;
+
+    document.getElementById("cancel-button").onclick = function () {
+        hidePanel(5, true);
+    }
+
+    document.getElementById("confirm-button").onclick = function () {
+        onConfirm();
+        hidePanel(5, true);
+    };
+
+    showPanel(5, true);
 }
