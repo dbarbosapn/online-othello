@@ -9,8 +9,6 @@
  */
 var currPanel = 0;
 
-var currInstructionBox = 1;
-
 const configuration = {
     gameType: "ai",
     playerColor: "light",
@@ -64,55 +62,85 @@ function setupConfiguration() {
 }
 
 function setupInstructions() {
+    /* Getting the references for each button*/
     let instButton = document.getElementById("inst-button");
     let nextButton = document.getElementById("inst-next");
     let prevButton = document.getElementById("inst-prev");
     let closeButton = document.getElementById("close-button-inst");
-    prevButton.style.display = "none";
+  
+    /* This array shall hold the all diferent references for the instruction pages*/
+    let instBox = new Array();
 
-    let instBox1 = document.getElementById("inst-box-1");
-    let instBox2 = document.getElementById("inst-box-2");
-    instBox2.style.display = "none";
-    let instBox3 = document.getElementById("inst-box-3");
-    instBox3.style.display = "none";
+    /* As the name implies, it holds the possition in the instruction manual, as well
+        as the first and last page number. If we want to add more pages its as simple
+        as changing the value of instLastPage!!! */
+    let instCurPage;
+    let instFirstPage = 1;
+    let instLastPage = 3;
 
+    /* Function to track all the instruction boxes and save it in an array. */
+    function trackInstBox() {
+        for ( let i=instFirstPage; i<=instLastPage; i++ ) {
+            instBox[i] = document.getElementById("inst-box-"+i);
+        }
+    }
+
+    trackInstBox();
+
+    /* Funtion to remove all pages from the screen */
+    function resetPages() {
+        for ( let i=instFirstPage; i<=instLastPage; i++) {
+            instBox[i].style.display = "none";
+        }
+    }
+
+    /* Function to add a page to the current screen */
+    function instSwitchPage(current) {
+        resetPages();
+        instBox[current].style.display = "flex";
+        instButtonMechanic(current);
+    }
+
+    /* Button mechanics. Its in charge of dealing with the buttons. 
+        For example, on the last page we can«t have a next button. */
+    function instButtonMechanic(current) {
+        switch (current) {
+            case instFirstPage:
+                prevButton.style.display = "none"; 
+                nextButton.style.display = "block";
+                break;
+
+            case instLastPage:
+                prevButton.style.display = "block"; 
+                nextButton.style.display = "none";
+                break;
+            
+            default:
+                prevButton.style.display = "block"; 
+                nextButton.style.display = "block";
+        }
+    }
+
+    /* What to do when a certain reference is clicked on */
     instButton.onclick = function() {
         showPanel(3, true);
+        instCurPage = instFirstPage;
+        instSwitchPage(instFirstPage);
     }
 
     nextButton.onclick = function() {
-        if (currInstructionBox == 1) {
-            instBox1.style.display = "none";
-            instBox2.style.display = "flex";
-            prevButton.style.display = "block";
-        } else {
-            instBox2.style.display = "none";
-            instBox3.style.display = "flex";
-            nextButton.style.display = "none";
-        }
-        currInstructionBox++;
+        instCurPage++;
+        instSwitchPage(instCurPage);
     }
 
     prevButton.onclick = function() {
-        if (currInstructionBox == 2) {
-            instBox2.style.display = "none";
-            instBox1.style.display = "flex";
-            prevButton.style.display = "none";
-        } else {
-            instBox3.style.display = "none";
-            instBox2.style.display = "flex";
-            nextButton.style.display = "block";
-        }
-        currInstructionBox--;
+        instCurPage--;
+        instSwitchPage(instCurPage);
     }
 
     closeButton.onclick = function() {
-        currInstructionBox = 1;
-        instBox1.style.display = "flex";
-        instBox2.style.display = "none";
-        instBox3.style.display = "none";
-        prevButton.style.display = "none";
-        nextButton.style.display = "block";
+        instCurPage = instFirstPage;
+        instSwitchPage(instFirstPage);
         hidePanel(3, true);
     }
 }
@@ -203,8 +231,8 @@ function HighScore(name, date, score) {
 
 /* Array to test high Score table writing*/
 var players = [new HighScore("Enio", "31-12-20", 69),
-    new HighScore("Jesus", "0-0-0", 1000),
-    new HighScore("Diogo", "13-7-13", -1000)
+    new HighScore("Jesus", "0-0-0", 999),
+    new HighScore("Diogo", "13-7-13", 420)
 ];
 
 /* Right now the following functions are just for
