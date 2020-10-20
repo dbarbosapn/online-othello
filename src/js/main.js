@@ -6,6 +6,7 @@
  * 2 - Game
  * 3 - Instructions (Modal)
  * 4 - Highscore (Modal)
+ * 5 - Message (modal)
  */
 var currPanel = 0;
 
@@ -22,6 +23,7 @@ window.onload = function() {
     setupInstructions();
     setupHighScore();
     setupGame();
+    setupMessage();
 
     showPanel(currPanel);
 }
@@ -173,6 +175,50 @@ function setupGame() {
     }
 }
 
+function setupMessage() {
+   let closeButton = document.getElementById("msg-close-button");
+   let msgButton = document.getElementById("message-icon");
+
+
+   closeButton.onclick = function () {
+       hidePanel(5, true);
+   }
+
+   msgButton.onclick = function () {
+       showPanel(5, true);
+   }
+}
+
+/* Atenção a maneira de como estamos a guardar as msg. 
+    Deve haver uma maneira melhor de fazer isto!!!! */
+var msgContent = "";
+
+function outputMessage(type, msg) {
+    let ref = document.getElementById("msg-text-box");
+    let ref1 = document.getElementById("msg-close-button");
+
+    switch(type) {
+        case "error":
+            msgContent += "<p class=\" msg-style error-msg\">"+msg+"</p>";
+            break;
+            
+        case "info":
+            msgContent += "<p class=\" msg-style info-msg\">"+msg+"</p>";
+            break;
+
+        case "warning":
+            msgContent += "<p class=\" msg-style warning-msg\">"+msg+"</p>";
+            break;
+
+        default:
+            console.log("Error type unknown!!!");
+            break;
+    }
+
+    ref.innerHTML = msgContent;
+    ref1.scrollIntoView();
+}
+
 function switchPanel(newPanel) {
     hidePanel(currPanel);
     showPanel(newPanel);
@@ -216,7 +262,9 @@ function getBoxName(panel) {
         case 3:
             return "inst-box";
         case 4:
-            return "high-score-box"
+            return "high-score-box";
+        case 5:
+            return "msg-box";
     }
 
     return "";

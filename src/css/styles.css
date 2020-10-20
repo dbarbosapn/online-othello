@@ -236,6 +236,13 @@ table#type1 {
 	cursor: pointer;
 }
 
+.bottom-left-button {
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	cursor: pointer;
+}
+
 .top-right-button {
 	position: fixed;
 	top: 20px;
@@ -248,4 +255,35 @@ table#type1 {
 	top: 20px;
 	left: 20px;
 	cursor: pointer;
+}
+
+/* Message-box*/
+#msg-box {
+	max-height: 85%;
+	overflow-y: scroll;
+}
+
+#msg-text-box {
+	width: 70%;
+}
+
+.msg-style {
+	border: #2c3e50 solid 5px;
+	margin: 5px;
+	text-align: center;
+}
+
+.error-msg {
+	color: #e74c3c;
+	border-color: #e74c3c;
+}
+
+.info-msg {
+	color: #34495e;
+	border-color: #34495e;
+}
+
+.warning-msg {
+	color: #dbdf1b;
+	border-color: #dbdf1b;
 }
