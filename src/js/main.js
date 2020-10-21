@@ -24,7 +24,6 @@ window.onload = function() {
     setupInstructions();
     setupHighScore();
     setupGame();
-    setupMessage();
 
     showPanel(currPanel);
 }
@@ -59,6 +58,8 @@ function setupConfiguration() {
         else configuration.playerColor = "dark";
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
+
+        document.getElementById("msg-box").style.display = "flex";
 
         switchPanel(2);
     }
@@ -164,6 +165,7 @@ function setupHighScore() {
     }
 }
 
+
 function setupGame() {
     let manual = document.getElementById("manual-icon");
     let ranking = document.getElementById("ranking-icon");
@@ -184,24 +186,8 @@ function setupGame() {
     }
 }
 
-function setupMessage() {
-   let closeButton = document.getElementById("msg-close-button");
-   let msgButton = document.getElementById("message-icon");
-
-
-   closeButton.onclick = function () {
-       hidePanel(5, true);
-   }
-
-   msgButton.onclick = function () {
-       showPanel(5, true);
-       document.getElementById("msg-close-button").scrollIntoView();
-   }
-}
-
 function outputMessage(type, msg) {
-    let ref = document.getElementById("msg-text-box");
-    let ref1 = document.getElementById("msg-close-button");
+    let ref = document.getElementById("msg-box");
     
     /* Creating a new element of type p*/
     let newElem = document.createElement("p");
@@ -239,8 +225,8 @@ function outputMessage(type, msg) {
     /* Adding the new node created previously, aka newElem, to the end of ref */
     ref.appendChild(newElem);
 
-    /* Auto scroll into view the reference ref1 */
-    ref1.scrollIntoView();
+    /* Auto scroll into view the reference ref */
+    newElem.scrollIntoView();
 }
 
 function switchPanel(newPanel) {

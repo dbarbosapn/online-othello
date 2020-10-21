@@ -258,19 +258,25 @@ table#type1 {
 }
 
 /* Message-box*/
-#msg-box {
-	max-height: 85%;
-	overflow-y: scroll;
-}
 
-#msg-text-box {
-	width: 70%;
+.msg-text-box {
+	width: 20%;
+	height: 50%;
+	overflow-y: scroll;
+	background-color: rgb(5, 5, 5,0.2);
+	position:fixed;
+	left: 20px;
+	bottom: 20px;
+	display: none;
+	z-index: 0;
 }
 
 .msg-style {
 	border: #2c3e50 solid 5px;
 	margin: 5px;
+	overflow-wrap: break-word;
 	text-align: center;
+	height: auto;
 }
 
 .error-msg {
@@ -279,8 +285,8 @@ table#type1 {
 }
 
 .info-msg {
-	color: #34495e;
-	border-color: #34495e;
+	color: #5e87af;
+	border-color: #5e87af;
 }
 
 .warning-msg {
