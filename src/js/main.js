@@ -195,36 +195,51 @@ function setupMessage() {
 
    msgButton.onclick = function () {
        showPanel(5, true);
+       document.getElementById("msg-close-button").scrollIntoView();
    }
 }
-
-/* Atenção a maneira de como estamos a guardar as msg. 
-    Deve haver uma maneira melhor de fazer isto!!!! */
-var msgContent = "";
 
 function outputMessage(type, msg) {
     let ref = document.getElementById("msg-text-box");
     let ref1 = document.getElementById("msg-close-button");
+    
+    /* Creating a new element of type p*/
+    let newElem = document.createElement("p");
+    
+    let className = "";
 
+    /* Defining the class to be used in newElem */
     switch(type) {
         case "error":
-            msgContent += "<p class=\" msg-style error-msg\">"+msg+"</p>";
+            className = "msg-style error-msg";
             break;
             
         case "info":
-            msgContent += "<p class=\" msg-style info-msg\">"+msg+"</p>";
+            className = "msg-style info-msg";           
             break;
 
         case "warning":
-            msgContent += "<p class=\" msg-style warning-msg\">"+msg+"</p>";
+            className = "msg-style warning-msg";            
             break;
 
         default:
             console.log("Error type unknown!!!");
-            break;
+            return;
     }
 
-    ref.innerHTML = msgContent;
+    /* Changing the class of newElem. Previously <p> now <p class=className> 
+        carefull with the spacing of the string className. I think DOM specifies
+        that each class MUST be seperated by a space.*/
+    newElem.classList = className;
+
+    /* Adding a text node to newElem. Previousle <p class...></p> now 
+        <p class...>msgContent</p> */
+    newElem.appendChild(document.createTextNode(msg));
+
+    /* Adding the new node created previously, aka newElem, to the end of ref */
+    ref.appendChild(newElem);
+
+    /* Auto scroll into view the reference ref1 */
     ref1.scrollIntoView();
 }
 
