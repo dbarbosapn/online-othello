@@ -6,8 +6,7 @@
  * 2 - Game
  * 3 - Instructions (Modal)
  * 4 - Highscore (Modal)
- * 5 - Message (modal)
- * 6 - Confirmation (Modal)
+ * 5 - Confirmation (Modal)
  */
 var currPanel = 0;
 
@@ -271,8 +270,6 @@ function getBoxName(panel) {
         case 4:
             return "high-score-box";
         case 5:
-            return "msg-box";
-        case 6:
             return "confirmation-dialog";
     }
 
@@ -320,13 +317,13 @@ function showConfirmationDialog(title, content, onConfirm) {
     document.getElementById("dialog-content").innerText = content;
 
     document.getElementById("cancel-button").onclick = function () {
-        hidePanel(6, true);
+        hidePanel(5, true);
     }
 
     document.getElementById("confirm-button").onclick = function () {
         onConfirm();
-        hidePanel(6, true);
+        hidePanel(5, true);
     };
 
-    showPanel(6, true);
+    showPanel(5, true);
 }
