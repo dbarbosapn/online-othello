@@ -6,7 +6,7 @@
  * 2 - Game
  * 3 - Instructions (Modal)
  * 4 - Highscore (Modal)
- * 5 - Message (modal)
+ * 5 - End game dialog (modal)
  * 6 - Confirmation (Modal)
  */
 var currPanel = 0;
@@ -183,11 +183,12 @@ function setupGame() {
     }
 }
 
+function alertMessages (str, time=-1) {
+    alert.settime
+}
+
 function outputMessage(type, msg) {
     let ref = document.getElementById("msg-box");
-    
-    /* Creating a new element of type p*/
-    let newElem = document.createElement("p");
     
     let className = "";
 
@@ -207,23 +208,49 @@ function outputMessage(type, msg) {
 
         default:
             console.log("Error type unknown!!!");
+            className = "none";
             return;
     }
 
-    /* Changing the class of newElem. Previously <p> now <p class=className> 
-        carefull with the spacing of the string className. I think DOM specifies
-        that each class MUST be seperated by a space.*/
-    newElem.classList = className;
+    addElement(ref, "p", className, msg).scrollIntoView(true);
+}
 
-    /* Adding a text node to newElem. Previousle <p class...></p> now 
-        <p class...>msgContent</p> */
+/* Jesus! Becarefull with this function. As someone who programs in C
+    this function look like utter trash! Am not checking anything! 
+    By the way, it returns the element added!*/
+function addElement(reference, whatType, whatClass="none", msg) {
+    /* Creating a new element of type "whatType", where whatType=="p" || 
+        whatType=="h1" etc..*/
+    let newElem = document.createElement(whatType);
+
+    /* Changing the class of newElem. Previously <whatType> now <whatType class=whatClass> 
+        carefull with the spacing of the string whatClass. I think DOM specifies
+        that each class MUST be seperated by a space.*/
+    if ( whatClass!="none" ) {
+        newElem.classList = whatClass;
+    }
+
+    /* Adding a text node to newElem. Previousle <whatType class...></whatType> now 
+        <whatType class...>msg</whatType> */
     newElem.appendChild(document.createTextNode(msg));
 
     /* Adding the new node created previously, aka newElem, to the end of ref */
-    ref.appendChild(newElem);
+    reference.appendChild(newElem);
 
-    /* Auto scroll into view the reference ref */
-    newElem.scrollIntoView();
+    return newElem;
+}
+
+function endGame (str) {
+    let display = document.getElementById("end-game-dialog");
+
+    showPanel(5, true);
+    let newElem = addElement(display, "h1", "none", str);
+
+    setTimeout(function() { 
+        hidePanel(5, true);
+        switchPanel(1);
+        newElem.remove();
+    }, 3000);
 }
 
 function switchPanel(newPanel) {
@@ -271,7 +298,7 @@ function getBoxName(panel) {
         case 4:
             return "high-score-box";
         case 5:
-            return "msg-box";
+            return "end-game-dialog";
         case 6:
             return "confirmation-dialog";
     }
