@@ -183,10 +183,6 @@ function setupGame() {
     }
 }
 
-function alertMessages (str, time=-1) {
-    alert.settime
-}
-
 function outputMessage(type, msg) {
     let ref = document.getElementById("msg-box");
     
@@ -347,13 +343,13 @@ function showConfirmationDialog(title, content, onConfirm) {
     document.getElementById("dialog-content").innerText = content;
 
     document.getElementById("cancel-button").onclick = function () {
-        hidePanel(5, true);
+        hidePanel(6, true);
     }
 
     document.getElementById("confirm-button").onclick = function () {
         onConfirm();
-        hidePanel(5, true);
+        hidePanel(6, true);
     };
 
-    showPanel(5, true);
+    showPanel(6, true);
 }
