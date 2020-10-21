@@ -347,13 +347,13 @@ function showConfirmationDialog(title, content, onConfirm) {
     document.getElementById("dialog-content").innerText = content;
 
     document.getElementById("cancel-button").onclick = function () {
-        hidePanel(6, true);
+        hidePanel(5, true);
     }
 
     document.getElementById("confirm-button").onclick = function () {
         onConfirm();
-        hidePanel(6, true);
+        hidePanel(5, true);
     };
 
-    showPanel(6, true);
+    showPanel(5, true);
 }
