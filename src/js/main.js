@@ -59,8 +59,6 @@ function setupConfiguration() {
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
 
-        document.getElementById("msg-box").style.display = "flex";
-
         switchPanel(2);
     }
 }
@@ -164,7 +162,6 @@ function setupHighScore() {
         hidePanel(4, true);
     }
 }
-
 
 function setupGame() {
     let manual = document.getElementById("manual-icon");
