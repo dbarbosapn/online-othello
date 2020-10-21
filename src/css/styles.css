@@ -236,6 +236,13 @@ table#type1 {
 	cursor: pointer;
 }
 
+.bottom-left-button {
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	cursor: pointer;
+}
+
 .top-right-button {
 	position: fixed;
 	top: 20px;
@@ -248,4 +255,40 @@ table#type1 {
 	top: 20px;
 	left: 20px;
 	cursor: pointer;
+}
+
+/* Message-box*/
+
+.msg-text-box {
+	width: 20%;
+	height: 50%;
+	overflow-y: scroll;
+	background-color: rgb(5, 5, 5,0.2);
+	position:fixed;
+	left: 20px;
+	bottom: 20px;
+	z-index: inherit;
+}
+
+.msg-style {
+	border: #2c3e50 solid 5px;
+	margin: 5px;
+	overflow-wrap: break-word;
+	text-align: center;
+	height: auto;
+}
+
+.error-msg {
+	color: #e74c3c;
+	border-color: #e74c3c;
+}
+
+.info-msg {
+	color: #5e87af;
+	border-color: #5e87af;
+}
+
+.warning-msg {
+	color: #dbdf1b;
+	border-color: #dbdf1b;
 }

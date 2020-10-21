@@ -122,11 +122,12 @@ function setupInstructions() {
         }
     }
 
+    instCurPage = instFirstPage;
+    instSwitchPage(instFirstPage);
+
     /* What to do when a certain reference is clicked on */
     instButton.onclick = function() {
         showPanel(3, true);
-        instCurPage = instFirstPage;
-        instSwitchPage(instFirstPage);
     }
 
     nextButton.onclick = function() {
@@ -179,6 +180,49 @@ function setupGame() {
             alert("You have forfeit!");
         });
     }
+}
+
+function outputMessage(type, msg) {
+    let ref = document.getElementById("msg-box");
+    
+    /* Creating a new element of type p*/
+    let newElem = document.createElement("p");
+    
+    let className = "";
+
+    /* Defining the class to be used in newElem */
+    switch(type) {
+        case "error":
+            className = "msg-style error-msg";
+            break;
+            
+        case "info":
+            className = "msg-style info-msg";           
+            break;
+
+        case "warning":
+            className = "msg-style warning-msg";            
+            break;
+
+        default:
+            console.log("Error type unknown!!!");
+            return;
+    }
+
+    /* Changing the class of newElem. Previously <p> now <p class=className> 
+        carefull with the spacing of the string className. I think DOM specifies
+        that each class MUST be seperated by a space.*/
+    newElem.classList = className;
+
+    /* Adding a text node to newElem. Previousle <p class...></p> now 
+        <p class...>msgContent</p> */
+    newElem.appendChild(document.createTextNode(msg));
+
+    /* Adding the new node created previously, aka newElem, to the end of ref */
+    ref.appendChild(newElem);
+
+    /* Auto scroll into view the reference ref */
+    newElem.scrollIntoView();
 }
 
 function switchPanel(newPanel) {
