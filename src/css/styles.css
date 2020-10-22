@@ -312,3 +312,53 @@ table#type1 {
 #game-alert h1 {
 	margin: 10px;
 }
+
+/* ---- Board ---- */
+#board {
+	text-align: center;
+	position: relative;
+	width: 336px;
+	height: 336px;
+	background: white;
+	display: inline-flex;
+	flex-wrap: wrap;
+	border-style: solid;
+	border-width: 5px;
+	border-radius: 5px;
+	border-color: #222;
+	margin: 3px;
+	margin-top: 10%;
+}
+
+.cell {
+	width: 40px;
+	height: 40px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	background: #d89c3b;
+}
+
+.dark {
+	background: #333;
+	opacity: 0.9;
+}
+
+.light {
+	background: #ccc;
+	opacity: 0.9;
+}
+
+.piece {
+	width: 35px;
+	height: 35px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: grey;
+	border-radius: 18px;
+	margin: 2px;
+}
+
+.empty {
+	opacity: 0;
+}
