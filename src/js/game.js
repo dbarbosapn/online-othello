@@ -5,17 +5,17 @@ class Point {
         this.y = y;
     }
 
-    /* Add point and return a new point */
+    /* Add point and return a new added point */
     addPoint(point) {
         return new Point(this.x + point.x, this.y + point.y);
     }
 
-    /* Sub point and return a new point */
+    /* Sub point and return a new subed point */
     subPoint(point) {
         return new Point(this.x - point.x, this.y - point.y);
     }
 
-    /* Mult point and return a new point */
+    /* Mult point and return a the new mult point */
     prodPoint(point) {
         return new Point(this.x * point.x, this.y * point.y);
     }
@@ -50,12 +50,12 @@ class Board {
 
     }
 
-    /* Clones the current board and return a new one, with the exact same elements */
+    /* Clones the current board and returns a new one, with the exact same elements */
     cloneBoard() {
         return new Board(this.size, this.state, this.dark, this.light);
     }
 
-    /* method initiates the board with four pieces in the middle, 2 white and 2 black */
+    /* This method initiates the board with four pieces in the middle, 2 white and 2 black */
     startState() {
         let totalSize = this.size*this.size;
 
@@ -73,7 +73,7 @@ class Board {
         this.addPiece('2', point.addPoint(new Point(1,0)));  
     }
 
-    /* Copies the current possitions of the pieces given in the argument state 
+    /* Copies the current possitions of the pieces in "state" 
         and saves it in this.state*/
     copyState(state) {
         let totalSize = this.size*this.size;
@@ -83,15 +83,15 @@ class Board {
         }
     }
 
-    /* Transforms a coordinate, like (1, 2) into someting that and array can 
+    /* Transforms a coordinate, like (1, 2) into someting that an array can 
         "read". Example: (1,2) => 2*size of board + 1 */
     decodeCoordinates(point) {
         return point.y*this.size + point.x;
     }
 
-    /* To be easier for the user to read and do debug this method transforms
-        the the saved pieces in char form to string form. ONLY TO BE USED FOR 
-        DEBBUGIN, DO NOT USE IT ANYWHERE ELSE */
+    /* To be easier for the user to read and do debugging, this method transforms
+        the saved pieces in char form to string form. ONLY TO BE USED FOR 
+        DEBUGGIN, DO NOT USE IT ANYWHERE ELSE */
     decodePieceType(ch) {
         switch(ch) {
             case '0':
@@ -108,7 +108,7 @@ class Board {
         }
     }
 
-    /* Print the current board and  the number of darks and whites! */
+    /* Print the current board and the number of darks and whites pieces! */
     debugBoard() {
         if ( this.state.length == 0 ) {
             console.log("Nothing yet!");
@@ -139,8 +139,8 @@ class Board {
         }
     }
 
-    /* This method ONLY adds a piece in a possition point. It does not check
-        if it is occupied. It does however increse the countage of light or dark. 
+    /* This method adds a piece in possition "point". It does not check
+        if it's occupied. It does however increse the counter of light and dark pieces 
         This method should not be used by the programmer directly!*/
     addPiece(type, point) {
         if ( type == '1' ) {
@@ -154,8 +154,8 @@ class Board {
         this.state[this.decodeCoordinates(point)] = type;
     }
 
-    /*  This method ONLY subtract a piece in a possition point. It does not check
-        if it is occupied. It does however decrease the countage of light or dark 
+    /*  This method subs a piece in possition "point". It does not check
+        if it's occupied. It does however decreases the counter of light and dark pieces 
         This method should not be used by the programmer directly!*/
     rmPiece(point) {
         let type = this.state[this.decodeCoordinates(point)];
@@ -171,7 +171,7 @@ class Board {
         this.state[this.decodeCoordinates(point)] = '0';
     }
 
-    /* As the name suggest it inverts the type of a piece. 
+    /* As the name suggest, it inverts the type of a piece. 
         Example: dark -> light, empty -> empty, light -> dark*/
     invertType(type) {
         switch( type ) {
@@ -186,7 +186,7 @@ class Board {
         }
     }
 
-    /* Get the type of the piece in possition point. Becarfull with going out of bounds
+    /* Get the type of the piece in possition "point". Becarefull with going out of bounds
         because this methods does not check it */
     getPiece(point) {
         if ( this.state.length == 0 ) {D
@@ -198,19 +198,19 @@ class Board {
     }
 
 
-    /* Return true if point is inside of the boards*/
+    /* Returns true if "point" is inside of the board*/
     insideBoard(point) {
         return point.x >= 0 && point.x < this.size && point.y >= 0 && point.y < this.size ? true: false;
     }
 
-    /* This is a special method. This method will return true if the piece in possition
-        point has the same tipe as the argument passed "type" and point is inside of the board*/
+    /* This method will return true if the piece in possition "point" has the same 
+        color as "type"*/
     inRange(type, point) {
         return this.insideBoard(point) && this.getPiece(point) == type ? true: false;
     }
 
-    /* method returns an array of pieces(points) to be flipped. In case there isn't, it 
-        will return [] */
+    /* This method returns an array of pieces(points) to be flipped in a GIVEN 
+        direction "vec"(vector). In case there isn't, it will return [] */
     getArrayOfPieces(type, point, vec) {
         let arr = [];
         let p = point.addPoint(vec);
@@ -228,6 +228,7 @@ class Board {
         }
     }
 
+    /* Get all the flippable pieces from all directions */
     getAllflippablePieces(type, point) {
         let arr = [];
         let type1 = this.invertType(type);;
@@ -244,22 +245,20 @@ class Board {
         return arr;
     }
 
-    /* Flip a piece to type "type". It does not check if it exists */
+    /* Flip a piece to color "type". It does not check if it exists */
     flipPiece(point, type) {
         this.rmPiece(point);
         this.addPiece(type, point);
     }
 
-    /* Flips all the pieces in arrPoint to the new type "type" */
+    /* Flips all the pieces in arrPoint to the new color "type" */
     flipArrayOfPieces(arrPoint, type) {
         for ( let i=0; i<arrPoint.length; i++ ) {
             this.flipPiece(arrPoint[i], type);
         }
     }
 
-    /* method will check all direction for "point" and see if there is anything to flip. 
-        It will do so, by calling getArrayOfPieces for each direction. 
-        Check getArrayOfPieces for more info */
+    /* Method will find and flip all possible pieces*/
     flipAllPieces(type, point) {
         let arr = this.getAllflippablePieces(type, point);
 
@@ -267,7 +266,8 @@ class Board {
     }
 
     /* This method returns True if a possition is valid i.e the point is inside of the board and 
-        the piece will flip some piece of the adversary */
+        the piece will flip some piece of the adversary. When i mean adversary, am referring 
+        the pieces that have an inverse color to "type" */
     validPosstion(point, type) {
         return this.insideBoard(point) && this.getPiece(point) == '0' && this.getAllflippablePieces(type, point).length != 0 ? true: false;    
     }
