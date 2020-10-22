@@ -16,6 +16,8 @@ const configuration = {
     aiDifficulty: "easy",
 }
 
+let currentBoard = new Board(8);
+
 window.onload = function() {
     hideOverlay();
     setupAuthentication();
@@ -195,18 +197,26 @@ function setupBoard() {
 
             let piece = document.createElement("div");
             piece.className = "piece";
-            if ((i == 3 && j == 3) || (i == 4 && j == 4)) piece.classList.add("light");
-            else if ((i == 4 && j == 3) || (i == 3 && j == 4)) piece.classList.add("dark");
-            else piece.classList.add("empty");
+            piece.classList.add("empty");
             
             cell.appendChild(piece);
 
-            //TODO: Trocar isto conforme jogabilidade
             cell.onclick = function () {
-                setPiece(i, j, configuration.playerColor);
+                currentBoard = currentBoard.newPiece(configuration.playerColor, new Point(i, j));
+                processBoard();
             }
 
             board.appendChild(cell);
+        }
+    }
+
+    processBoard();
+}
+
+function processBoard() {
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            setPiece(i, j, currentBoard.getPieceName(new Point(i, j)));
         }
     }
 }
@@ -252,10 +262,6 @@ function outputMessage(type, msg) {
         case "warning":
             className = "msg-style warning-msg";            
             break;
-
-        default:
-            console.log("Error type unknown!!!");
-            return;
     }
 
     addTextElement(ref, "p", msg, className).scrollIntoView(true);
