@@ -19,6 +19,10 @@ class Point {
     prodPoint(point) {
         return new Point(this.x * point.x, this.y * point.y);
     }
+
+    tostring() {
+        return "(" + this.x + "," + this.y+ ")";
+    }
 }
 
 
@@ -224,6 +228,22 @@ class Board {
         }
     }
 
+    getAllflippablePieces(type, point) {
+        let arr = [];
+        let type1 = this.invertType(type);;
+
+        for ( let i = -1; i<=1; i++ ) {
+            if ( i != 0) {
+                arr = arr.concat(this.getArrayOfPieces(type1, point, new Point(i,0)));
+                arr = arr.concat(this.getArrayOfPieces(type1, point, new Point(0,i)));
+                arr = arr.concat(this.getArrayOfPieces(type1, point, new Point(i,i)));
+                arr = arr.concat(this.getArrayOfPieces(type1, point, new Point(i,-i)));
+            }
+        }
+
+        return arr;
+    }
+
     /* Flip a piece to type "type". It does not check if it exists */
     flipPiece(point, type) {
         this.rmPiece(point);
@@ -241,16 +261,15 @@ class Board {
         It will do so, by calling getArrayOfPieces for each direction. 
         Check getArrayOfPieces for more info */
     flipAllPieces(type, point) {
-        let type1 = this.invertType(type);
-        
-        for ( let i = -1; i<=1; i++ ) {
-            if ( i != 0) {
-                this.flipArrayOfPieces(this.getArrayOfPieces(type1, point, new Point(i,0)), type);
-                this.flipArrayOfPieces(this.getArrayOfPieces(type1, point, new Point(0,i)), type);
-                this.flipArrayOfPieces(this.getArrayOfPieces(type1, point, new Point(i,i)), type);
-                this.flipArrayOfPieces(this.getArrayOfPieces(type1, point, new Point(i,-i)), type);
-            }
-        }     
+        let arr = this.getAllflippablePieces(type, point);
+
+        this.flipArrayOfPieces(arr, type);
+    }
+
+    /* This method returns True if a possition is valid i.e the point is inside of the board and 
+        the piece will flip some piece of the adversary */
+    validPosstion(point, type) {
+        return this.insideBoard(point) && this.getPiece(point) == '0' && this.getAllflippablePieces(type, point).length != 0 ? true: false;    
     }
 
     /* This method will clone the current board, then will flip the piece in "point" and flip
@@ -271,7 +290,7 @@ class Board {
     }
 }
 
-/* Testing */
+/* Testing: to test do: node src/js/game.js */
 
 function test() {
     board = new Board(10);
@@ -293,6 +312,9 @@ function test() {
     board.debugBoard();
     board = board.newPiece('2', new Point(22, 2));
     board.debugBoard();
+
+    console.log(board.validPosstion(new Point(3,3), '1')+(new Point(3,3).tostring()));
+    console.log(board.validPosstion(new Point(4,6), '2')+(new Point(4,6).tostring()));
 }
 
 console.log(test());
