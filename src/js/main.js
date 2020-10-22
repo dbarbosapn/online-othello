@@ -167,6 +167,8 @@ function setupGame() {
     let ranking = document.getElementById("ranking-icon");
     let forfeit = document.getElementById("forfeit-flag");
 
+    setupBoard();
+
     manual.onclick = function () {
         showPanel(3, true);
     }
@@ -179,6 +181,56 @@ function setupGame() {
         showConfirmationDialog("Forfeit", "Are you sure you want to forfeit?", function () {
             alert("You have forfeit!");
         });
+    }
+}
+
+function setupBoard() {
+    let board = document.getElementById("board");
+
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            let cell = document.createElement("div");
+            cell.className = "cell";
+            cell.id = `cell-${i}-${j}`;
+
+            let piece = document.createElement("div");
+            piece.className = "piece";
+            if ((i == 3 && j == 3) || (i == 4 && j == 4)) piece.classList.add("light");
+            else if ((i == 4 && j == 3) || (i == 3 && j == 4)) piece.classList.add("dark");
+            else piece.classList.add("empty");
+            
+            cell.appendChild(piece);
+
+            //TODO: Trocar isto conforme jogabilidade
+            cell.onclick = function () {
+                setPiece(i, j, configuration.playerColor);
+            }
+
+            board.appendChild(cell);
+        }
+    }
+}
+
+function setPiece(i, j, type) {
+    let cell = document.getElementById(`cell-${i}-${j}`);
+    let piece = cell.firstChild;
+
+    switch (type) {
+        case "empty":
+            piece.classList.remove("light");
+            piece.classList.remove("dark");
+            piece.classList.add("empty");
+            break;
+        case "light":
+            piece.classList.remove("empty");
+            piece.classList.remove("dark");
+            piece.classList.add("light");
+            break;
+        case "dark":
+            piece.classList.remove("light");
+            piece.classList.remove("empty");
+            piece.classList.add("dark");
+            break;
     }
 }
 
