@@ -185,10 +185,7 @@ function setupGame() {
 function outputMessage(type, msg) {
     let ref = document.getElementById("msg-box");
     
-    /* Creating a new element of type p*/
-    let newElem = document.createElement("p");
-    
-    let className = "";
+    let className = null;
 
     /* Defining the class to be used in newElem */
     switch(type) {
@@ -209,20 +206,37 @@ function outputMessage(type, msg) {
             return;
     }
 
-    /* Changing the class of newElem. Previously <p> now <p class=className> 
-        carefull with the spacing of the string className. I think DOM specifies
-        that each class MUST be seperated by a space.*/
-    newElem.classList = className;
+    addTextElement(ref, "p", msg, className).scrollIntoView(true);
+}
 
-    /* Adding a text node to newElem. Previousle <p class...></p> now 
-        <p class...>msgContent</p> */
+function addTextElement(reference, whatType, msg, whatClass = null) {
+    /* Creating a new element of type "whatType", where whatType=="p" || 
+        whatType=="h1" etc..*/
+    let newElem = document.createElement(whatType);
+
+    /* Changing the class of newElem. Previously <whatType> now <whatType class=whatClass> */
+    if (whatClass) {
+        newElem.classList = whatClass;
+    }
+
+    /* Adding a text node to newElem. Previousle <whatType class...></whatType> now 
+        <whatType class...>msg</whatType> */
     newElem.appendChild(document.createTextNode(msg));
 
     /* Adding the new node created previously, aka newElem, to the end of ref */
-    ref.appendChild(newElem);
+    reference.appendChild(newElem);
 
-    /* Auto scroll into view the reference ref */
-    newElem.scrollIntoView();
+    return newElem;
+}
+
+function showGameAlert (str) {
+    let display = document.getElementById("game-alert");
+
+    let newElem = addTextElement(display, "h1", str);
+
+    setTimeout(function() { 
+        newElem.remove();
+    }, 3000);
 }
 
 function switchPanel(newPanel) {
