@@ -6,8 +6,7 @@
  * 2 - Game
  * 3 - Instructions (Modal)
  * 4 - Highscore (Modal)
- * 5 - End game dialog (modal)
- * 6 - Confirmation (Modal)
+ * 5 - Confirmation (Modal)
  */
 var currPanel = 0;
 
@@ -186,7 +185,7 @@ function setupGame() {
 function outputMessage(type, msg) {
     let ref = document.getElementById("msg-box");
     
-    let className = "";
+    let className = null;
 
     /* Defining the class to be used in newElem */
     switch(type) {
@@ -204,25 +203,19 @@ function outputMessage(type, msg) {
 
         default:
             console.log("Error type unknown!!!");
-            className = "none";
             return;
     }
 
-    addElement(ref, "p", className, msg).scrollIntoView(true);
+    addTextElement(ref, "p", msg, className).scrollIntoView(true);
 }
 
-/* Jesus! Becarefull with this function. As someone who programs in C
-    this function look like utter trash! Am not checking anything! 
-    By the way, it returns the element added!*/
-function addElement(reference, whatType, whatClass="none", msg) {
+function addTextElement(reference, whatType, msg, whatClass = null) {
     /* Creating a new element of type "whatType", where whatType=="p" || 
         whatType=="h1" etc..*/
     let newElem = document.createElement(whatType);
 
-    /* Changing the class of newElem. Previously <whatType> now <whatType class=whatClass> 
-        carefull with the spacing of the string whatClass. I think DOM specifies
-        that each class MUST be seperated by a space.*/
-    if ( whatClass!="none" ) {
+    /* Changing the class of newElem. Previously <whatType> now <whatType class=whatClass> */
+    if (whatClass) {
         newElem.classList = whatClass;
     }
 
@@ -236,15 +229,12 @@ function addElement(reference, whatType, whatClass="none", msg) {
     return newElem;
 }
 
-function endGame (str) {
-    let display = document.getElementById("end-game-dialog");
+function showGameAlert (str) {
+    let display = document.getElementById("game-alert");
 
-    showPanel(5, true);
-    let newElem = addElement(display, "h1", "none", str);
+    let newElem = addTextElement(display, "h1", str);
 
     setTimeout(function() { 
-        hidePanel(5, true);
-        switchPanel(1);
         newElem.remove();
     }, 3000);
 }
@@ -294,8 +284,6 @@ function getBoxName(panel) {
         case 4:
             return "high-score-box";
         case 5:
-            return "end-game-dialog";
-        case 6:
             return "confirmation-dialog";
     }
 
@@ -343,13 +331,13 @@ function showConfirmationDialog(title, content, onConfirm) {
     document.getElementById("dialog-content").innerText = content;
 
     document.getElementById("cancel-button").onclick = function () {
-        hidePanel(6, true);
+        hidePanel(5, true);
     }
 
     document.getElementById("confirm-button").onclick = function () {
         onConfirm();
-        hidePanel(6, true);
+        hidePanel(5, true);
     };
 
-    showPanel(6, true);
+    showPanel(5, true);
 }
