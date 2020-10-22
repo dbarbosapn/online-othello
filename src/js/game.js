@@ -51,7 +51,7 @@ class Board {
         return new Board(this.size, this.state, this.dark, this.light);
     }
 
-    /* Function initiates the board with four pieces in the middle, 2 white and 2 black */
+    /* method initiates the board with four pieces in the middle, 2 white and 2 black */
     startState() {
         let totalSize = this.size*this.size;
 
@@ -85,7 +85,7 @@ class Board {
         return point.y*this.size + point.x;
     }
 
-    /* To be easier for the user to read and do debug this function transforms
+    /* To be easier for the user to read and do debug this method transforms
         the the saved pieces in char form to string form. ONLY TO BE USED FOR 
         DEBBUGIN, DO NOT USE IT ANYWHERE ELSE */
     decodePieceType(ch) {
@@ -135,9 +135,9 @@ class Board {
         }
     }
 
-    /* This function ONLY adds a piece in a possition point. It does not check
+    /* This method ONLY adds a piece in a possition point. It does not check
         if it is occupied. It does however increse the countage of light or dark. 
-        This function should not be used by the programmer directly!*/
+        This method should not be used by the programmer directly!*/
     addPiece(type, point) {
         if ( type == '1' ) {
             this.dark++;
@@ -150,9 +150,9 @@ class Board {
         this.state[this.decodeCoordinates(point)] = type;
     }
 
-    /*  This function ONLY subtract a piece in a possition point. It does not check
+    /*  This method ONLY subtract a piece in a possition point. It does not check
         if it is occupied. It does however decrease the countage of light or dark 
-        This function should not be used by the programmer directly!*/
+        This method should not be used by the programmer directly!*/
     rmPiece(point) {
         let type = this.state[this.decodeCoordinates(point)];
 
@@ -183,7 +183,7 @@ class Board {
     }
 
     /* Get the type of the piece in possition point. Becarfull with going out of bounds
-        because this functions does not check it */
+        because this methods does not check it */
     getPiece(point) {
         if ( this.state.length == 0 ) {D
             return '0'
@@ -199,13 +199,13 @@ class Board {
         return point.x >= 0 && point.x < this.size && point.y >= 0 && point.y < this.size ? true: false;
     }
 
-    /* This is a special function. This function will return true if the piece in possition
+    /* This is a special method. This method will return true if the piece in possition
         point has the same tipe as the argument passed "type" and point is inside of the board*/
     inRange(type, point) {
         return this.insideBoard(point) && this.getPiece(point) == type ? true: false;
     }
 
-    /* Funtion returns an array of pieces(points) to be flipped. In case there isn't, it 
+    /* method returns an array of pieces(points) to be flipped. In case there isn't, it 
         will return [] */
     getArrayOfPieces(type, point, vec) {
         let arr = [];
@@ -237,7 +237,7 @@ class Board {
         }
     }
 
-    /* Funtion will check all direction for "point" and see if there is anything to flip. 
+    /* method will check all direction for "point" and see if there is anything to flip. 
         It will do so, by calling getArrayOfPieces for each direction. 
         Check getArrayOfPieces for more info */
     flipAllPieces(type, point) {
