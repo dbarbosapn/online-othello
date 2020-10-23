@@ -23,9 +23,10 @@ class Point {
     1 = dark
     2 = light */
 class Board {
-    constructor(size, state = null, dark = 0, light = 0) {
+    constructor(size, state = null, currentPlayer = 1, dark = 0, light = 0) {
         this.dark = dark;
         this.light = light;
+        this.currentPlayer = currentPlayer;
 
         this.size = size;
         this.state = [];
@@ -35,6 +36,16 @@ class Board {
         } else {
             this.state = [...state];
         }
+    }
+
+    score(type) {
+        if (type === 1) {
+            return this.dark;
+        } else if(type === 2) {
+            return this.light;
+        }
+
+        return 0;
     }
 
     /* Clones the current board and returns a new one, with the exact same elements */
@@ -58,9 +69,9 @@ class Board {
     /* This method adds a piece in possition "point". It does not check
         if it's occupied. It does however increse the counter of light and dark pieces */
     addPiece(type, point) {
-        if (type == 1) {
+        if (type === 1) {
             this.dark++;
-        } else if (type == 2) {
+        } else if (type === 2) {
             this.light++;
         }
 
@@ -72,11 +83,11 @@ class Board {
     removePiece(point) {
         let type = this.getPiece(point);
 
-        if ( type == 1 ) {
+        if ( type === 1 ) {
             this.dark--;
         }
 
-        else if ( type == 2 ) {
+        else if ( type === 2 ) {
             this.light--;
         }
 
@@ -176,26 +187,14 @@ class Board {
         the piece will flip some piece of the adversary. When I mean adversary, am referring 
         to pieces that have an inverse color to "type" */
     validPosition(point, type) {
-        return this.insideBoard(point) && this.getPiece(point) === 0 && this.getAllFlippablePieces(type, point).length > 0;    
+        return type === this.currentPlayer && this.insideBoard(point) && this.getPiece(point) === 0 && this.getAllFlippablePieces(type, point).length > 0;    
     }
 
     /* This method will clone the current board, then will flip the piece in "point" and flip
-        all possible pieces that follows. It case of fail it will return the current board*/
+        all possible pieces that follows. It case of fail it will return null */
     newPiece(type, point) {
-        switch (type) {
-            case "empty":
-                type = 0;
-                break;
-            case "dark":
-                type = 1;
-                break;
-            case "light":
-                type = 2;
-                break;
-        }
-
         if (!this.validPosition(point, type)) {
-            return this;
+            return null;
         }
 
         let newBoard = this.cloneBoard();
@@ -203,6 +202,8 @@ class Board {
         newBoard.flipPiece(point, type);
 
         newBoard.flipAllPieces(type, point);
+
+        newBoard.currentPlayer = this.invertType(type);
 
         return newBoard;
     }
