@@ -16,7 +16,8 @@ const configuration = {
     aiDifficulty: "easy",
 }
 
-let currentBoard = new Board(8);
+var currentBoard = new Board(8);
+var enemy;
 
 window.onload = function() {
     hideOverlay();
@@ -59,6 +60,24 @@ function setupConfiguration() {
         else configuration.playerColor = "dark";
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
+
+        let depth = 0;
+        switch (configuration.aiDifficulty) {
+            case "easy":
+                depth = 1;
+                break;
+            case "moderate":
+                depth = 3;
+                break;
+            case "hard":
+                depth = 6;
+                break;
+            case "hardcore":
+                depth = 10;
+                break;
+        }
+
+        enemy = new AIPlayer(depth, getTypeId(configuration.playerColor === "light" ? "dark" : "light"));
 
         switchPanel(2);
     }
@@ -202,8 +221,19 @@ function setupBoard() {
             cell.appendChild(piece);
 
             cell.onclick = function () {
-                currentBoard = currentBoard.newPiece(configuration.playerColor, new Point(i, j));
-                processBoard();
+                let newBoard = currentBoard.newPiece(getTypeId(configuration.playerColor), new Point(i, j));
+
+                if (newBoard) {
+                    currentBoard = newBoard;
+                    processBoard();
+
+                    if (configuration.gameType === "ai") {
+                        setTimeout(() => {
+                            currentBoard = enemy.calculateNextMove(currentBoard);
+                            processBoard();
+                        }, 3000);
+                    }
+                }
             }
 
             board.appendChild(cell);
@@ -211,6 +241,13 @@ function setupBoard() {
     }
 
     processBoard();
+
+    if (configuration.gameType === "ai" && configuration.playerColor === "light") {
+        setTimeout(() => {
+            currentBoard = enemy.calculateNextMove(currentBoard);
+            processBoard();
+        }, 3000);
+    }
 }
 
 function processBoard() {
@@ -398,4 +435,19 @@ function showConfirmationDialog(title, content, onConfirm) {
     };
 
     showPanel(5, true);
+}
+
+function getTypeId(type) {
+    switch (type) {
+        case "empty":
+            type = 0;
+            break;
+        case "dark":
+            type = 1;
+            break;
+        case "light":
+            type = 2;
+            break;
+    }
+    return type;
 }
