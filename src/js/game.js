@@ -229,6 +229,12 @@ class Board {
     }
 }
 
+function startGame() {
+    if ( configuration.playerColor === "light" ) {
+        aiTurn();
+    }
+}
+
 function playerTurn(point) {
     if ( currentBoard.gameEnd() ) {
         /* End game message function */

@@ -82,6 +82,8 @@ function setupConfiguration() {
         setupBoard();        
 
         switchPanel(2);
+
+        startGame();
     }
 }
 
@@ -205,8 +207,6 @@ function setupGame() {
     }
 }
 
-var lastPoint = null;
-
 function setupBoard() {
     let board = document.getElementById("board");
 
@@ -231,10 +231,6 @@ function setupBoard() {
     }
 
     processBoard();
-
-    if ( configuration.playerColor === "light" ) {
-        aiTurn();
-    }
 }
 
 function processBoard() {
