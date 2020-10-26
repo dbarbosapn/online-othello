@@ -79,6 +79,8 @@ function setupConfiguration() {
 
         enemy = new AIPlayer(depth, getTypeId(configuration.playerColor === "light" ? "dark" : "light"));
 
+        setupBoard();        
+
         switchPanel(2);
     }
 }
@@ -188,8 +190,6 @@ function setupGame() {
     let ranking = document.getElementById("ranking-icon");
     let forfeit = document.getElementById("forfeit-flag");
 
-    setupBoard();
-
     manual.onclick = function () {
         showPanel(3, true);
     }
@@ -204,6 +204,8 @@ function setupGame() {
         });
     }
 }
+
+var lastPoint = null;
 
 function setupBoard() {
     let board = document.getElementById("board");
@@ -221,19 +223,7 @@ function setupBoard() {
             cell.appendChild(piece);
 
             cell.onclick = function () {
-                let newBoard = currentBoard.newPiece(getTypeId(configuration.playerColor), new Point(i, j));
-
-                if (newBoard) {
-                    currentBoard = newBoard;
-                    processBoard();
-
-                    if (configuration.gameType === "ai") {
-                        setTimeout(() => {
-                            currentBoard = enemy.calculateNextMove(currentBoard);
-                            processBoard();
-                        }, 3000);
-                    }
-                }
+                playerTurn(new Point(i, j));
             }
 
             board.appendChild(cell);
@@ -242,11 +232,8 @@ function setupBoard() {
 
     processBoard();
 
-    if (configuration.gameType === "ai" && configuration.playerColor === "light") {
-        setTimeout(() => {
-            currentBoard = enemy.calculateNextMove(currentBoard);
-            processBoard();
-        }, 3000);
+    if ( configuration.playerColor === "light" ) {
+        aiTurn();
     }
 }
 
@@ -262,20 +249,19 @@ function setPiece(i, j, type) {
     let cell = document.getElementById(`cell-${i}-${j}`);
     let piece = cell.firstChild;
 
+    piece.classList.remove("light");
+    piece.classList.remove("dark");
+    piece.classList.remove("empty");
+
+
     switch (type) {
         case "empty":
-            piece.classList.remove("light");
-            piece.classList.remove("dark");
             piece.classList.add("empty");
             break;
         case "light":
-            piece.classList.remove("empty");
-            piece.classList.remove("dark");
             piece.classList.add("light");
             break;
         case "dark":
-            piece.classList.remove("light");
-            piece.classList.remove("empty");
             piece.classList.add("dark");
             break;
     }

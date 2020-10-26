@@ -207,4 +207,63 @@ class Board {
 
         return newBoard;
     }
+
+    getPossibleMoves(board) {
+        let moves = [];
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                if (board.validPosition(new Point(i, j), this.type))
+                    moves.push(board.newPiece(this.type, new Point(i, j)));
+            }
+        }
+
+        return moves;
+    }
+
+    noMove() {
+        return this.getPossibleMoves(this) === [];
+    }
+
+    gameEnd() {
+        return this.dark+this.light == 8*8 || this.dark == 0 || this.light == 0 ? true: false;
+    }
+}
+
+function playerTurn(point) {
+    if ( currentBoard.gameEnd() ) {
+        /* End game message function */
+    }
+    
+    else if ( currentBoard.noMove() ) {
+        return aiTurn();
+    }
+
+    let newBoard = currentBoard.newPiece(getTypeId(configuration.playerColor), point);
+
+    if ( newBoard ) {
+        currentBoard = newBoard;
+        processBoard();
+        aiTurn();
+    }
+
+    else {
+        /* Invalid possition. Ask for player input*/
+    }
+}
+
+function aiTurn() {
+    if ( currentBoard.gameEnd() ) {
+        /* End game message function */
+    }
+    
+    else if ( currentBoard.noMove() ) {
+        /* Ask player input */
+        return;
+    }
+    
+    currentBoard = enemy.calculateNextMove(currentBoard); 
+
+    setTimeout(() => {
+        processBoard();
+    }, 1000);
 }
