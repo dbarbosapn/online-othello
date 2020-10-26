@@ -4,23 +4,6 @@ class AIPlayer {
         this.type = type;
     }
 
-    getPossibleMoves(board) {
-        let moves = [];
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                if (board.validPosition(new Point(i, j), this.type))
-                    moves.push(board.newPiece(this.type, new Point(i, j)));
-            }
-        }
-
-        return moves;
-    }
-
-    inverseType() {
-        if (this.type === 1) return 2;
-        return 1;
-    }
-
     // Wrapper for simple usage
     calculateNextMove(board) {
         return this._minimax(board);
@@ -28,10 +11,10 @@ class AIPlayer {
 
     _minimax(board, depth = 0, playing = true, alpha = -100000, beta = -100000) {
         if (depth >= this.maxDepth) {
-            return board.score(this.type) - board.score(this.inverseType());
+            return board.score(this.type) - board.score(invertType(this.type));
         }
 
-        let moves = this.getPossibleMoves(board);
+        let moves = board.getPossibleMoves(this.type);
         let bestMove;
 
         if (playing) {
@@ -51,6 +34,7 @@ class AIPlayer {
             } else {
                 return alpha;
             }
+
         } else {
             let min = 100000;
             moves.some(move => { 

@@ -12,11 +12,10 @@ var currPanel = 0;
 
 const configuration = {
     gameType: "ai",
-    playerColor: "light",
+    playerColor: 0,
     aiDifficulty: "easy",
 }
 
-var currentBoard = new Board(8);
 var enemy;
 
 window.onload = function() {
@@ -53,11 +52,15 @@ function setupConfiguration() {
     }
 
     button.onclick = function() {
-        if (vsAi.checked) configuration.gameType = "ai";
-        else configuration.gameType = "player";
+        if (vsAi.checked) 
+            configuration.gameType = "ai";
+        else 
+            configuration.gameType = "player";
 
-        if (document.getElementById("color-light").checked) configuration.playerColor = "light";
-        else configuration.playerColor = "dark";
+        if (document.getElementById("color-light").checked) 
+            configuration.playerColor = 2;
+        else 
+            configuration.playerColor = 1;
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
 
@@ -77,7 +80,7 @@ function setupConfiguration() {
                 break;
         }
 
-        enemy = new AIPlayer(depth, getTypeId(configuration.playerColor === "light" ? "dark" : "light"));
+        enemy = new AIPlayer(depth, invertType(configuration.playerColor));
 
         setupBoard();        
 
@@ -229,14 +232,14 @@ function setupBoard() {
             board.appendChild(cell);
         }
     }
-
-    processBoard();
 }
 
-function processBoard() {
+function processBoard(board) {
+    console.log("dark="+board.dark+" light="+board.light);
+
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            setPiece(i, j, currentBoard.getPieceName(new Point(i, j)));
+            setPiece(i, j, board.getPieceName(new Point(i, j)));
         }
     }
 }
