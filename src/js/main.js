@@ -12,11 +12,10 @@ var currPanel = 0;
 
 const configuration = {
     gameType: "ai",
-    playerColor: "light",
+    playerColor: 0,
     aiDifficulty: "easy",
 }
 
-var currentBoard = new Board(8);
 var enemy;
 
 window.onload = function() {
@@ -53,11 +52,15 @@ function setupConfiguration() {
     }
 
     button.onclick = function() {
-        if (vsAi.checked) configuration.gameType = "ai";
-        else configuration.gameType = "player";
+        if (vsAi.checked) 
+            configuration.gameType = "ai";
+        else 
+            configuration.gameType = "player";
 
-        if (document.getElementById("color-light").checked) configuration.playerColor = "light";
-        else configuration.playerColor = "dark";
+        if (document.getElementById("color-light").checked) 
+            configuration.playerColor = 2;
+        else 
+            configuration.playerColor = 1;
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
 
@@ -77,9 +80,13 @@ function setupConfiguration() {
                 break;
         }
 
-        enemy = new AIPlayer(depth, getTypeId(configuration.playerColor === "light" ? "dark" : "light"));
+        enemy = new AIPlayer(depth, invertType(configuration.playerColor));
+
+        setupBoard();        
 
         switchPanel(2);
+
+        startGame();
     }
 }
 
@@ -188,8 +195,6 @@ function setupGame() {
     let ranking = document.getElementById("ranking-icon");
     let forfeit = document.getElementById("forfeit-flag");
 
-    setupBoard();
-
     manual.onclick = function () {
         showPanel(3, true);
     }
@@ -221,39 +226,20 @@ function setupBoard() {
             cell.appendChild(piece);
 
             cell.onclick = function () {
-                let newBoard = currentBoard.newPiece(getTypeId(configuration.playerColor), new Point(i, j));
-
-                if (newBoard) {
-                    currentBoard = newBoard;
-                    processBoard();
-
-                    if (configuration.gameType === "ai") {
-                        setTimeout(() => {
-                            currentBoard = enemy.calculateNextMove(currentBoard);
-                            processBoard();
-                        }, 3000);
-                    }
-                }
+                playerTurn(new Point(i, j));
             }
 
             board.appendChild(cell);
         }
     }
-
-    processBoard();
-
-    if (configuration.gameType === "ai" && configuration.playerColor === "light") {
-        setTimeout(() => {
-            currentBoard = enemy.calculateNextMove(currentBoard);
-            processBoard();
-        }, 3000);
-    }
 }
 
-function processBoard() {
+function processBoard(board) {
+    console.log("dark="+board.dark+" light="+board.light);
+
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            setPiece(i, j, currentBoard.getPieceName(new Point(i, j)));
+            setPiece(i, j, board.getPieceName(new Point(i, j)));
         }
     }
 }
@@ -262,20 +248,19 @@ function setPiece(i, j, type) {
     let cell = document.getElementById(`cell-${i}-${j}`);
     let piece = cell.firstChild;
 
+    piece.classList.remove("light");
+    piece.classList.remove("dark");
+    piece.classList.remove("empty");
+
+
     switch (type) {
         case "empty":
-            piece.classList.remove("light");
-            piece.classList.remove("dark");
             piece.classList.add("empty");
             break;
         case "light":
-            piece.classList.remove("empty");
-            piece.classList.remove("dark");
             piece.classList.add("light");
             break;
         case "dark":
-            piece.classList.remove("light");
-            piece.classList.remove("empty");
             piece.classList.add("dark");
             break;
     }
