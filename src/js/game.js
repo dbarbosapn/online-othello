@@ -235,9 +235,7 @@ function startGame() {
     if (configuration.playerColor == 2) {
         if(configuration.gameType === "ai") aiTurn();
     } else {
-        /* Player start the game message. No need to call 
-            playerTurn function, because the click from the 
-            user does it*/
+        showGameAlert("Your turn!");
     }
 }
 
@@ -273,9 +271,6 @@ function aiTurn() {
             verifyButtonVisibility();
 
             showGameAlert("Your turn!");
-        } else {
-            // Game ended
-            endGame();
         }
     }, 1500);
 }
@@ -284,7 +279,7 @@ function aiTurn() {
     the game has ended or no possible moves */
 function checkStuck(type) {
     if (currentBoard.gameEnd()) {
-        // This condition will be caught separately
+        endGame();
         return false;
     } else if (currentBoard.noMove(type)) {
         noMovesMessage(type);
@@ -292,11 +287,6 @@ function checkStuck(type) {
     }
 
     return false;
-}
-
-/* Altera a teu gosto */
-function endGame() {
-    console.log("Game has ended");
 }
 
 function noMovesMessage(type) {

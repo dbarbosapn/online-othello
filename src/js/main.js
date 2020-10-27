@@ -179,13 +179,13 @@ function setupHighScore() {
     let closeButton = document.getElementById("close-button-hs");
     let highScore = document.getElementById("highScore-button");
 
-    displayHighScore();
-
     highScore.onclick = function() {
         showPanel(4, true);
     }
 
-    closeButton.onclick = function() {
+    closeButton.onclick = function () {
+        document.getElementById("won-text").style.display = "none";
+        document.getElementById("lost-text").style.display = "none";
         hidePanel(4, true);
     }
 }
@@ -194,6 +194,7 @@ function setupGame() {
     let manual = document.getElementById("manual-icon");
     let ranking = document.getElementById("ranking-icon");
     let forfeit = document.getElementById("forfeit-flag");
+    let skip = document.getElementById("skip-icon");
 
     manual.onclick = function() {
         showPanel(3, true);
@@ -205,14 +206,30 @@ function setupGame() {
 
     forfeit.onclick = function() {
         showConfirmationDialog("Forfeit", "Are you sure you want to forfeit?", function() {
-            alert("You have forfeit!");
+            if (configuration.playerColor === 1) {
+                currentBoard.dark = 0;
+            } else {
+                currentBoard.light = 0;
+            }
+
+            endGame();
         });
     }
     forfeit.style.display = "none";
+
+    skip.onclick = function () {
+        forfeit.style.display = "none";
+        skip.style.display = "none";
+        currentBoard.currentPlayer = invertType(configuration.playerColor);
+        aiTurn();
+    }
+    skip.style.display = "none";
 }
 
 function setupBoard() {
     let board = document.getElementById("board");
+
+    board.innerHTML = '';
 
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
@@ -237,13 +254,16 @@ function setupBoard() {
 
 function verifyButtonVisibility() {
     let forfeit = document.getElementById("forfeit-flag");
+    let skip = document.getElementById("skip-icon");
 
     if (checkStuck(configuration.playerColor)) {
         // Show pass button and forfeit too
         forfeit.style.display = "block";
+        skip.style.display = "block";
         outputMessage("warning", "No moves left. You can forfeit or pass the turn.");
     } else {
         forfeit.style.display = "none";
+        skip.style.display = "none";
     }
 }
 
@@ -253,6 +273,10 @@ function processBoard(board) {
             setPiece(i, j, board.getPieceName(new Point(i, j)));
         }
     }
+
+    document.getElementById("dark-pieces").innerText = board.dark;
+    document.getElementById("light-pieces").innerText = board.light;
+    document.getElementById("empty-cells").innerText = (board.size * board.size - board.light - board.dark);
 }
 
 function setPiece(i, j, type) {
@@ -321,6 +345,8 @@ function addTextElement(reference, whatType, msg, whatClass = null) {
 }
 
 function showGameAlert(str) {
+    if (currPanel !== 2) return;
+
     let display = document.getElementById("game-alert");
 
     let newElem = addTextElement(display, "h1", str);
@@ -381,40 +407,20 @@ function getBoxName(panel) {
     return "";
 }
 
-/* HighScores*/
-function HighScore(name, date, score) {
+/* Scores */
+function Score(name, date, score) {
     this.name = name;
     this.date = date;
     this.score = score;
 }
 
-/* Array to test high Score table writing*/
-var players = [new HighScore("Enio", "31-12-20", 69),
-    new HighScore("Jesus", "0-0-0", 999),
-    new HighScore("Diogo", "13-7-13", 420)
-];
-
-/* Right now the following functions are just for
-    testing the High Score panel. But i think we can
-    use them when we actually want to have a real HS.
-    The structure can also be usefull for implementing
-    a message board or a command feedback*/
-function displayHighScore() {
+function displayScores(scores) {
     let content = "";
-    players.sort((a, b) => b.score - a.score);
-    players.forEach((player) => content += '<tr><td>' + player.name + '</td><td>' + player.date + '</td><td>' + player.score + '</td></tr>');
+    scores.sort((a, b) => b.score - a.score);
+
+    console.log(scores);
+    scores.forEach((score) => content += '<tr><td>' + score.name + '</td><td>' + score.date + '</td><td>' + score.score + '</td></tr>');
     document.getElementById("highscore-content").innerHTML = content;
-}
-
-function displayMiniHighScore() {
-    let content = "";
-    players.sort((a, b) => a.score - b.score);
-
-    players.forEach(player => {
-        content += '<tr><td>' + player.name + '</td></tr>'
-    });
-
-    document.getElementById("mini-highscore-content").innerHTML = content;
 }
 
 function showConfirmationDialog(title, content, onConfirm) {
@@ -446,4 +452,33 @@ function getTypeId(type) {
             break;
     }
     return type;
+}
+
+function endGame() {
+    if (configuration.gameType === "ai") {
+        let playerScore = currentBoard.score(configuration.playerColor);
+        let aiScore = currentBoard.score(invertType(configuration.playerColor));
+
+        let date = new Date();
+        let scores = [
+            new Score("Player", date.toLocaleDateString(), playerScore),
+            new Score("AI", date.toLocaleDateString(), aiScore)
+        ];
+
+        // Setup the scores
+        displayScores(scores);
+        if (playerScore > aiScore) {
+            document.getElementById("won-text").style.display = "inline";
+        } else if (playerScore < aiScore) {
+            document.getElementById("lost-text").style.display = "inline";
+        }
+
+        // Go back to configuration
+        switchPanel(1);
+
+        // Show highscores
+        showPanel(4, true);
+    } else {
+        // Multiplayer
+    }
 }

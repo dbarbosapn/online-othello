@@ -147,7 +147,9 @@
 
             <!-- High Score -->
             <div class="panel modal" id="high-score-box" >
-                <h1>High Score</h1>
+                <h1>Scores</h1>
+                <h2 id="won-text">Congratulations! You won!</h2>
+                <h2 id="lost-text">You lost!</h2>
                 <table>
                     <thead>
                         <th>Name</th>
@@ -167,10 +169,16 @@
             <!-- Game -->
             <div id="game-box" class="panel-game">
                 <img id="forfeit-flag" class="image-holder bottom-right-button" src="img/white-flag.png" />
+                <img id="skip-icon" class="image-holder bottom-right-button-2" src="img/skip.png" />
                 <img id="manual-icon" class="image-holder top-right-button" src="img/manual.png" />
                 <img id="ranking-icon" class="image-holder top-left-button" src="img/ranking.png" />
 
                 <div id="board"></div>
+                <div class="state">
+                    <p>Dark pieces: <span id="dark-pieces"></span></p>
+                    <p>Light pieces: <span id="light-pieces"></span></p>
+                    <p>Empty cells: <span id="empty-cells"></span></p>
+                </div>
             
                 <!-- Messages-->
                 <div class="text-box msg-text-box modal" id="msg-box">
@@ -196,7 +204,7 @@
             </div>
 
             <!-- Game Alert-->
-            <div class="panel modal no-background" id="game-alert" />
+            <div class="panel modal no-background" id="game-alert"></div>
 
             <script src="js/game-ai.js"></script>
             <script src="js/game.js"></script>
