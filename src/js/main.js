@@ -52,14 +52,14 @@ function setupConfiguration() {
     }
 
     button.onclick = function() {
-        if (vsAi.checked) 
+        if (vsAi.checked)
             configuration.gameType = "ai";
-        else 
+        else
             configuration.gameType = "player";
 
-        if (document.getElementById("color-light").checked) 
+        if (document.getElementById("color-light").checked)
             configuration.playerColor = 2;
-        else 
+        else
             configuration.playerColor = 1;
 
         configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
@@ -70,19 +70,19 @@ function setupConfiguration() {
                 depth = 1;
                 break;
             case "moderate":
-                depth = 3;
+                depth = 2;
                 break;
             case "hard":
-                depth = 6;
+                depth = 3;
                 break;
             case "hardcore":
-                depth = 10;
+                depth = 4;
                 break;
         }
 
         enemy = new AIPlayer(depth, invertType(configuration.playerColor));
 
-        setupBoard();        
+        setupBoard();
 
         switchPanel(2);
 
@@ -96,7 +96,7 @@ function setupInstructions() {
     let nextButton = document.getElementById("inst-next");
     let prevButton = document.getElementById("inst-prev");
     let closeButton = document.getElementById("close-button-inst");
-  
+
     /* This array shall hold the all diferent references for the instruction pages*/
     let instBox = new Array();
 
@@ -109,8 +109,8 @@ function setupInstructions() {
 
     /* Function to track all the instruction boxes and save it in an array. */
     function trackInstBox() {
-        for ( let i=instFirstPage; i<=instLastPage; i++ ) {
-            instBox[i] = document.getElementById("inst-box-"+i);
+        for (let i = instFirstPage; i <= instLastPage; i++) {
+            instBox[i] = document.getElementById("inst-box-" + i);
         }
     }
 
@@ -118,7 +118,7 @@ function setupInstructions() {
 
     /* Funtion to remove all pages from the screen */
     function resetPages() {
-        for ( let i=instFirstPage; i<=instLastPage; i++) {
+        for (let i = instFirstPage; i <= instLastPage; i++) {
             instBox[i].style.display = "none";
         }
     }
@@ -135,17 +135,17 @@ function setupInstructions() {
     function instButtonMechanic(current) {
         switch (current) {
             case instFirstPage:
-                prevButton.style.display = "none"; 
+                prevButton.style.display = "none";
                 nextButton.style.display = "block";
                 break;
 
             case instLastPage:
-                prevButton.style.display = "block"; 
+                prevButton.style.display = "block";
                 nextButton.style.display = "none";
                 break;
-            
+
             default:
-                prevButton.style.display = "block"; 
+                prevButton.style.display = "block";
                 nextButton.style.display = "block";
         }
     }
@@ -195,19 +195,20 @@ function setupGame() {
     let ranking = document.getElementById("ranking-icon");
     let forfeit = document.getElementById("forfeit-flag");
 
-    manual.onclick = function () {
+    manual.onclick = function() {
         showPanel(3, true);
     }
 
-    ranking.onclick = function () {
+    ranking.onclick = function() {
         showPanel(4, true);
     }
 
-    forfeit.onclick = function () {
-        showConfirmationDialog("Forfeit", "Are you sure you want to forfeit?", function () {
+    forfeit.onclick = function() {
+        showConfirmationDialog("Forfeit", "Are you sure you want to forfeit?", function() {
             alert("You have forfeit!");
         });
     }
+    forfeit.style.display = "none";
 }
 
 function setupBoard() {
@@ -222,7 +223,7 @@ function setupBoard() {
             let piece = document.createElement("div");
             piece.className = "piece";
             piece.classList.add("empty");
-            
+
             cell.appendChild(piece);
 
             cell.onclick = function () {
@@ -234,9 +235,19 @@ function setupBoard() {
     }
 }
 
-function processBoard(board) {
-    console.log("dark="+board.dark+" light="+board.light);
+function verifyButtonVisibility() {
+    let forfeit = document.getElementById("forfeit-flag");
 
+    if (checkStuck(configuration.playerColor)) {
+        // Show pass button and forfeit too
+        forfeit.style.display = "block";
+        outputMessage("warning", "No moves left. You can forfeit or pass the turn.");
+    } else {
+        forfeit.style.display = "none";
+    }
+}
+
+function processBoard(board) {    
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             setPiece(i, j, board.getPieceName(new Point(i, j)));
@@ -268,21 +279,21 @@ function setPiece(i, j, type) {
 
 function outputMessage(type, msg) {
     let ref = document.getElementById("msg-box");
-    
+
     let className = null;
 
     /* Defining the class to be used in newElem */
-    switch(type) {
+    switch (type) {
         case "error":
             className = "msg-style error-msg";
             break;
-            
+
         case "info":
-            className = "msg-style info-msg";           
+            className = "msg-style info-msg";
             break;
 
         case "warning":
-            className = "msg-style warning-msg";            
+            className = "msg-style warning-msg";
             break;
     }
 
@@ -309,14 +320,14 @@ function addTextElement(reference, whatType, msg, whatClass = null) {
     return newElem;
 }
 
-function showGameAlert (str) {
+function showGameAlert(str) {
     let display = document.getElementById("game-alert");
 
     let newElem = addTextElement(display, "h1", str);
 
-    setTimeout(function() { 
+    setTimeout(function() {
         newElem.remove();
-    }, 3000);
+    }, 1000);
 }
 
 function switchPanel(newPanel) {
@@ -410,11 +421,11 @@ function showConfirmationDialog(title, content, onConfirm) {
     document.getElementById("dialog-title").innerText = title;
     document.getElementById("dialog-content").innerText = content;
 
-    document.getElementById("cancel-button").onclick = function () {
+    document.getElementById("cancel-button").onclick = function() {
         hidePanel(5, true);
     }
 
-    document.getElementById("confirm-button").onclick = function () {
+    document.getElementById("confirm-button").onclick = function() {
         onConfirm();
         hidePanel(5, true);
     };

@@ -1,5 +1,5 @@
 class Point {
-    constructor(x=0, y=0) {
+    constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
     }
@@ -10,7 +10,7 @@ class Point {
     }
 
     toString() {
-        return "(" + this.x + "," + this.y+ ")";
+        return "(" + this.x + "," + this.y + ")";
     }
 
     toArrayIndex(size) {
@@ -42,7 +42,7 @@ class Board {
     }
 
     score(type) {
-        return type === 1 ? this.dark: this.light;
+        return type === 1 ? this.dark : this.light;
     }
 
     /* Clones the current board and returns a new one, with the exact same elements */
@@ -51,16 +51,16 @@ class Board {
     }
 
     /* This method initiates the board with four pieces in the middle, 2 white and 2 black */
-    startState() {        
+    startState() {
         for (let i = 0; i < this.size * this.size; i++) this.state[i] = 0;
 
         let middle = this.size / 2;
         let point = new Point(middle - 1, middle - 1);
 
         this.addPiece(1, point);
-        this.addPiece(1, point.addPoint(new Point(1,1)));
-        this.addPiece(2, point.addPoint(new Point(0,1)));
-        this.addPiece(2, point.addPoint(new Point(1,0)));
+        this.addPiece(1, point.addPoint(new Point(1, 1)));
+        this.addPiece(2, point.addPoint(new Point(0, 1)));
+        this.addPiece(2, point.addPoint(new Point(1, 0)));
     }
 
     /* This method adds a piece in possition "point". It does not check
@@ -80,11 +80,9 @@ class Board {
     removePiece(point) {
         let type = this.getPiece(point);
 
-        if ( type === 1 ) {
+        if (type === 1) {
             this.dark--;
-        }
-
-        else if ( type === 2 ) {
+        } else if (type === 2) {
             this.light--;
         }
 
@@ -94,7 +92,7 @@ class Board {
     /* As the name suggests, it inverts the type of a piece. 
         Example: dark -> light, empty -> empty, light -> dark*/
     invertType(type) {
-        switch( type ) {
+        switch (type) {
             case 1:
                 return 2;
             case 2:
@@ -107,7 +105,7 @@ class Board {
     /* Get the type of the piece in position "point". Be careful with going out of bounds
         because this methods does not check it */
     getPiece(point) {
-        if (this.state.length === 0) 
+        if (this.state.length === 0)
             return 0
         else
             return this.state[point.toArrayIndex(this.size)];
@@ -184,7 +182,7 @@ class Board {
         the piece will flip some piece of the adversary. When I mean adversary, am referring 
         to pieces that have an inverse color to "type" */
     validPosition(point, type) {
-        return this.insideBoard(point) && this.getPiece(point) === 0 && this.getAllFlippablePieces(type, point).length > 0;    
+        return this.insideBoard(point) && this.getPiece(point) === 0 && this.getAllFlippablePieces(type, point).length > 0;
     }
 
     /* This method will clone the current board, then will flip the piece in "point" and flip
@@ -210,7 +208,7 @@ class Board {
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
                 if (this.validPosition(new Point(i, j), type)) {
-                    moves.push(this.newPiece(type, new Point(i, j))); 
+                    moves.push(this.newPiece(type, new Point(i, j)));
                 }
             }
         }
@@ -223,7 +221,8 @@ class Board {
     }
 
     gameEnd() {
-        return this.dark+this.light == 8*8 || this.dark == 0 || this.light == 0;
+        return this.dark + this.light == 8 * 8 || this.dark == 0 || this.light == 0
+            || (this.noMove(this.currentPlayer) && this.noMove(invertType(this.currentPlayer)));
     }
 }
 
@@ -233,11 +232,9 @@ function startGame() {
     processBoard(currentBoard);
 
     /* If player is light, dark starts i.e ai start. */
-    if ( configuration.playerColor == 2 ) {
-        aiTurn();
-    }
-
-    else {
+    if (configuration.playerColor == 2) {
+        if(configuration.gameType === "ai") aiTurn();
+    } else {
         /* Player start the game message. No need to call 
             playerTurn function, because the click from the 
             user does it*/
@@ -245,52 +242,51 @@ function startGame() {
 }
 
 function playerTurn(point) {
-    console.log("Player: "+point.toString());
+    if (configuration.playerColor !== currentBoard.currentPlayer) {
+        outputMessage("info", "Wait for your turn, please.")
+        return;
+    }
 
     let newBoard = currentBoard.newPiece(configuration.playerColor, point);
 
-    if ( newBoard ) {
+    if (newBoard) {
         currentBoard = newBoard;
         processBoard(currentBoard);
-        aiTurn();
-    }
-
-    else {
-        console.log("invalid possition");
+        if(configuration.gameType === "ai") aiTurn();
+    } else {
+        outputMessage("error", "Invalid move");
     }
 }
 
 function aiTurn() {
-    if ( checkStuck(invertType(configuration.playerColor)) ) 
-        return;
+    setTimeout(() => {
+        if (checkStuck(currentBoard.currentPlayer)) {
+            // AI passes the turn
+            currentBoard.currentPlayer = invertType(currentBoard.currentPlayer);
+            return;
+        }
+        
+        let newBoard = enemy.calculateNextMove(currentBoard);
+        if (newBoard) {
+            currentBoard = newBoard;
+            processBoard(currentBoard);
+            verifyButtonVisibility();
 
-    console.log("AI");
-    currentBoard = enemy.calculateNextMove(currentBoard); 
-
-     setTimeout(() => {
-        processBoard(currentBoard);
-    }, 1000);
-
-    /* We need a way to know if we need a user input i.e 
-        if the user has any possible moves. Because we 
-        enter state "playerTurn" from the user clicking 
-        on a title, but if user has no moves, then we don't
-        need to wait. All of this because javascript is a 
-        weird language and it runs like a fk script, no 
-        pauses always flowing forward*/
-    if ( checkStuck(configuration.playerColor) )
-        aiTurn();
+            showGameAlert("Your turn!");
+        } else {
+            // Game ended
+            endGame();
+        }
+    }, 1500);
 }
 
 /* Function checks if a player of type "type" is stuck, i.e 
     the game has ended or no possible moves */
 function checkStuck(type) {
-    if ( currentBoard.gameEnd() ) {
-        endGameMessage(type);
-        return true;
-    }
-    
-    else if ( currentBoard.noMove(type) ) {
+    if (currentBoard.gameEnd()) {
+        // This condition will be caught separately
+        return false;
+    } else if (currentBoard.noMove(type)) {
         noMovesMessage(type);
         return true;
     }
@@ -299,18 +295,18 @@ function checkStuck(type) {
 }
 
 /* Altera a teu gosto */
-function endGameMessage(type) {
+function endGame() {
     console.log("Game has ended");
 }
 
 function noMovesMessage(type) {
-    console.log(type+"has no moves");
+    outputMessage("warning", "Your opponent has no moves. It's your turn again");
 }
 
 /* As the name suggests, it inverts the type of a piece. 
     Example: dark -> light, empty -> empty, light -> dark*/
 function invertType(type) {
-    switch( type ) {
+    switch (type) {
         case 1:
             return 2;
         case 2:
