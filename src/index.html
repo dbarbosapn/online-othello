@@ -98,7 +98,7 @@
                                 <li>one player can not make a valid move to outflank the opponent.</li>
                                 <li>both players have no valid moves.</li>
                             </ul>
-                            When a player has no valid moves, he pass his turn and the opponent continues.</li>
+                            When a player has no valid moves, he pass his turn and the opponent continues.
                         </li>
                         <li>A player can not voluntarily forfeit his turn.</li>
                         <li>When both players can not make a valid move the game ends.</li>
@@ -152,9 +152,11 @@
                 <h2 id="lost-text">You lost!</h2>
                 <table>
                     <thead>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Score</th>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Score</th>
+                        </tr>
                     </thead>
     
                     <tbody id="highscore-content">
@@ -168,10 +170,10 @@
 
             <!-- Game -->
             <div id="game-box" class="panel-game">
-                <img id="forfeit-flag" class="image-holder bottom-right-button" src="img/white-flag.png" />
-                <img id="skip-icon" class="image-holder bottom-right-button-2" src="img/skip.png" />
-                <img id="manual-icon" class="image-holder top-right-button" src="img/manual.png" />
-                <img id="ranking-icon" class="image-holder top-left-button" src="img/ranking.png" />
+                <img id="forfeit-flag" alt="forfeit" class="image-holder bottom-right-button" src="img/white-flag.png" />
+                <img id="skip-icon" alt="skip" class="image-holder bottom-right-button-2" src="img/skip.png" />
+                <img id="manual-icon" alt="manual" class="image-holder top-right-button" src="img/manual.png" />
+                <img id="ranking-icon" alt="ranking" class="image-holder top-left-button" src="img/ranking.png" />
 
                 <div id="board"></div>
                 <div class="state">
