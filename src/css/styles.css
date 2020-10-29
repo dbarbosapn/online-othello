@@ -213,17 +213,12 @@ th {
 	color: #2c3e50;
 }
 
-/* Mini High Score. To be displayed on game plate*/
-
-table#type1 {
-	width: 150px;
+#won-text {
+	display: none;
 }
 
-.panel#mini-high-score-box {
-	display: flex;
-	position: fixed;
-	float: right;
-	width: 100px;
+#lost-text {
+	display: none;
 }
 
 /* ------ Game -------- */
@@ -239,6 +234,13 @@ table#type1 {
 .bottom-right-button {
 	position: fixed;
 	bottom: 20px;
+	right: 20px;
+	cursor: pointer;
+}
+
+.bottom-right-button-2 {
+	position: fixed;
+	bottom: 120px;
 	right: 20px;
 	cursor: pointer;
 }
@@ -262,6 +264,10 @@ table#type1 {
 	top: 20px;
 	left: 20px;
 	cursor: pointer;
+}
+
+.state p {
+	color: white;
 }
 
 /* Message-box*/
