@@ -5,6 +5,10 @@
         <title>Othello</title>
 
         <link rel="stylesheet" href="css/styles.css" />
+        <script src="js/game-ai.js"></script>
+        <script src="js/game.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/client.js"></script>
     </head>
 
     <body>
@@ -23,13 +27,18 @@
                 <h1>Authentication</h1>
 
                 <div class="user-pass">
-                    <input type="text" placeholder="Login">
-                    <input type="password" placeholder="Password">
+                    <input id="userName" type="text" placeholder="Login">
+                    <input id="userPass" type="password" placeholder="Password">
                 </div>
 
                 <div class="button" id="auth-button">
                     <p>Enter</p>
                 </div>
+            </div>
+
+            <!-- Connecting -->
+            <div id="connecting-box" class="panel">
+                <h1>Connecting</h1>
             </div>
 
             <!-- Configuration -->
@@ -48,7 +57,7 @@
                         </label>
                     </div>
 
-                    <div class="config-section">
+                    <div class="config-section" id="player-shit">
                         <h3>Player Color</h3>
                         <label for="color-light">
                             Light <input type="radio" id="color-light" name="player-color" value="light" checked>
@@ -207,10 +216,6 @@
 
             <!-- Game Alert-->
             <div class="panel modal no-background" id="game-alert"></div>
-
-            <script src="js/game-ai.js"></script>
-            <script src="js/game.js"></script>
-            <script src="js/main.js"></script>
         </div>
     </body>
 </html>

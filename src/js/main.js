@@ -17,6 +17,7 @@ const configuration = {
 }
 
 var enemy;
+var client;
 
 window.onload = function() {
     hideOverlay();
@@ -31,10 +32,24 @@ window.onload = function() {
 
 function setupAuthentication() {
     let button = document.getElementById("auth-button");
+    let userName = document.getElementById("userName");
+    let userPass = document.getElementById("userPass");
 
     button.onclick = function() {
-        switchPanel(1);
+        if ( userName.value != "" && userPass.value != "" )
+            connecting(userName.value, userPass.value);
+
+        else { /* Ask for input */}
     }
+}
+
+function connecting(name, pass)
+{
+    client = new Client(name, pass);
+
+    switchPanel(6);
+
+    client.executeCommandRegister();
 }
 
 function setupConfiguration() {
@@ -42,13 +57,16 @@ function setupConfiguration() {
     let vsAi = document.getElementById("vs-ai");
     let vsPlayer = document.getElementById("vs-player");
     let aiDifficultySection = document.getElementById("ai-difficulty-section");
+    let playerShit = document.getElementById("player-shit");
 
     vsAi.onchange = function() {
         aiDifficultySection.style.display = "flex";
+        playerShit.style.display = "flex";
     }
 
     vsPlayer.onchange = function() {
         aiDifficultySection.style.display = "none";
+        playerShit.style.display = "none";
     }
 
     button.onclick = function() {
@@ -402,6 +420,8 @@ function getBoxName(panel) {
             return "high-score-box";
         case 5:
             return "confirmation-dialog";
+        case 6:
+            return "connecting-box";
     }
 
     return "";
