@@ -18,9 +18,6 @@ class Point {
     }
 }
 
-
-var currentBoard = null;
-
 /*  Type
     0 = empty
     1 = dark
@@ -61,6 +58,17 @@ class Board {
         this.addPiece(1, point.addPoint(new Point(1, 1)));
         this.addPiece(2, point.addPoint(new Point(0, 1)));
         this.addPiece(2, point.addPoint(new Point(1, 0)));
+    }
+
+    arrayToBoard(array)
+    {
+        for( let i = 0; i<8; i++ )
+        {
+            for( let j=0; j<8; j++ )
+            {
+                
+            }
+        }
     }
 
     /* This method adds a piece in possition "point". It does not check
@@ -222,86 +230,160 @@ class Board {
 
     gameEnd() {
         return this.dark + this.light == 8 * 8 || this.dark == 0 || this.light == 0
-            || (this.noMove(this.currentPlayer) && this.noMove(invertType(this.currentPlayer)));
+            || (this.noMove(this.currentPlayer) && this.noMove(this.currentPlayer === 1 ? 2: 1));
     }
 }
 
-function startGame() {
-    /* Initialization of the board */
-    currentBoard = new Board(8);
-    processBoard(currentBoard);
+class AiGame
+{
+    constructor(depth, color, inter)
+    {
+        this.aiColor = color;
+        this.playerColor = color === 1 ? 2: 1;
+        this.interface = inter
 
-    /* If player is light, dark starts i.e ai start. */
-    if (configuration.playerColor == 2) {
-        if(configuration.gameType === "ai") aiTurn();
-    } else {
-        showGameAlert("Your turn!");
-    }
-}
+        /* Initialization of the board */
+        this.currentBoard = new Board(8);
 
-function playerTurn(point) {
-    if (configuration.playerColor !== currentBoard.currentPlayer) {
-        outputMessage("info", "Wait for your turn, please.")
-        return;
+        this.aiPlayer = new AIPlayer(depth, color);
+        this.interface.setupBoard();
+        this.interface.showGame();
+        this.startGame();
     }
 
-    let newBoard = currentBoard.newPiece(configuration.playerColor, point);
+    startGame() {
+        this.interface.processBoard(this.currentBoard);
 
-    if (newBoard) {
-        currentBoard = newBoard;
-        processBoard(currentBoard);
-        if(configuration.gameType === "ai") aiTurn();
-    } else {
-        outputMessage("error", "Invalid move");
+        /* If ai is dark => start. */
+        if (this.aiColor === 1) {
+            this.aiTurn();
+        } 
+        else {
+            this.interface.showGameAlert("Your turn!");
+        }
     }
-}
 
-function aiTurn() {
-    setTimeout(() => {
-        if (checkStuck(currentBoard.currentPlayer)) {
-            // AI passes the turn
-            currentBoard.currentPlayer = invertType(currentBoard.currentPlayer);
+    playerTurn(point) {
+        if (this.color === this.currentBoard.currentPlayer) {
+            this.interface.outputMessage("info", "Wait for your turn, please.")
             return;
         }
-        
-        let newBoard = enemy.calculateNextMove(currentBoard);
+
+        let newBoard = this.currentBoard.newPiece(this.playerColor, point);
+
         if (newBoard) {
-            currentBoard = newBoard;
-            processBoard(currentBoard);
-            verifyButtonVisibility();
-
-            showGameAlert("Your turn!");
+            this.currentBoard = newBoard;
+            this.interface.processBoard(this.currentBoard);
+            this.aiTurn();
+        } 
+        else {
+            this.interface.outputMessage("error", "Invalid move");
         }
-    }, 1500);
-}
+    }
 
-/* Function checks if a player of type "type" is stuck, i.e 
-    the game has ended or no possible moves */
-function checkStuck(type) {
-    if (currentBoard.gameEnd()) {
-        endGame();
+    aiTurn() {
+        setTimeout(() => {
+            if (this.checkStuck(this.currentBoard.currentPlayer)) {
+                // AI passes the turn
+                this.currentBoard.currentPlayer = this.invertType(this.currentBoard.currentPlayer);
+                return;
+            }
+            
+            let newBoard = this.aiPlayer.calculateNextMove(this.currentBoard);
+            if (newBoard) {
+                this.currentBoard = newBoard;
+                this.interface.processBoard(this.currentBoard);
+                this.interface.resetButtonVisibility();
+
+                this.interface.showGameAlert("Your turn!");
+            }
+        }, 1500);
+    }
+
+    /* Function checks if a player of type "type" is stuck, i.e 
+        the game has ended or no possible moves */
+    checkStuck(type) {
+        if (this.currentBoard.gameEnd()) {
+            this.endGame();
+            return false;
+        } 
+        
+        else if (this.currentBoard.noMove(type)) {
+            if ( this.currentBoard.currentPlayer === this.playerColor )
+                this.interface.verifyButtonVisibility();
+
+            else 
+                this.interface.showGameAlert("Your turn!");
+            return true;
+        }
+
         return false;
-    } else if (currentBoard.noMove(type)) {
-        noMovesMessage(type);
-        return true;
     }
 
-    return false;
-}
-
-function noMovesMessage(type) {
-    outputMessage("warning", "Your opponent has no moves. It's your turn again");
-}
-
-/* As the name suggests, it inverts the type of a piece. 
-    Example: dark -> light, empty -> empty, light -> dark*/
-function invertType(type) {
-    switch (type) {
-        case 1:
-            return 2;
-        case 2:
-            return 1;
-        default:
-            return 0;
+    /* Function checks if player is stuck */
+    checkPlayerStuck()
+    {
+        return this.checkStuck(this.playerColor);
     }
+
+
+    noMovesMessage(type) {
+        this.interface.outputMessage("warning", "Your opponent has no moves. It's your turn again");
+    }
+
+    /* As the name suggests, it inverts the type of a piece. 
+        Example: dark -> light, empty -> empty, light -> dark*/
+    invertType(type) {
+        switch (type) {
+            case 1:
+                return 2;
+            case 2:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+    endGame() {
+        let playerScore = this.currentBoard.score(this.playerColor);
+        let aiScore = this.currentBoard.score(this.playerColor == 1 ? 2: 1);
+
+        let date = new Date();
+        let scores = [
+            {name:"Player",date:date.toLocaleDateString(), score:playerScore},
+            {name:"Ai",date:date.toLocaleDateString(), score:aiScore}
+            ];
+
+        // Setup the scores
+        this.interface.displayScores(scores);
+        if (playerScore > aiScore) {
+            document.getElementById("won-text").style.display = "inline";
+        } else if (playerScore < aiScore) {
+            document.getElementById("lost-text").style.display = "inline";
+        }
+
+        // Go back to configuration
+        this.interface.switchPanel(1);
+
+        // Show highscores
+        this.interface.showPanel(4, true);
+    }    
+
+    forfeit()
+    {
+        this.currentBoard = new Board(8);
+        if ( this.currentPlayer === 2 )
+            {
+                this.currentBoard.light = 64;
+                this.currentBoard.dark = 0;
+            }
+
+        else
+        {
+            this.currentBoard.light = 0;
+            this.currentBoard.dark = 64;
+        }
+
+        this.endGame();
+    }
+            
 }
