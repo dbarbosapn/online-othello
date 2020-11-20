@@ -1,6 +1,6 @@
 /**
  * Panels:
- * 
+ *
  * 0 - Authentication
  * 1 - Configuration
  * 2 - Game
