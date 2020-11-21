@@ -8,486 +8,491 @@
  * 4 - Highscore (Modal)
  * 5 - Confirmation (Modal)
  */
-var currPanel = 0;
 
-const configuration = {
-	gameType: "ai",
-	playerColor: 0,
-	aiDifficulty: "easy",
-};
+class Interface {
+	constructor(client) {
+		this.currPanel = 0;
 
-var enemy;
+		this.configuration = {
+			gameType: "ai",
+			playerColor: 0,
+			aiDifficulty: "easy",
+		};
 
-window.onload = function () {
-	hideOverlay();
-	setupAuthentication();
-	setupConfiguration();
-	setupInstructions();
-	setupHighScore();
-	setupGame();
+		this.client = client;
+		console.log(this.client);
 
-	showPanel(currPanel);
-};
+		this.enemy = null;
 
-function setupAuthentication() {
-	let button = document.getElementById("auth-button");
+		this.hideOverlay();
+		this.setupAuthentication();
+		this.setupConfiguration();
+		this.setupInstructions();
+		this.setupHighScore();
+		this.setupGame();
 
-	button.onclick = function () {
-		switchPanel(1);
-	};
-}
-
-function setupConfiguration() {
-	let button = document.getElementById("config-button");
-	let vsAi = document.getElementById("vs-ai");
-	let vsPlayer = document.getElementById("vs-player");
-	let aiDifficultySection = document.getElementById("ai-difficulty-section");
-
-	vsAi.onchange = function () {
-		aiDifficultySection.style.display = "flex";
-	};
-
-	vsPlayer.onchange = function () {
-		aiDifficultySection.style.display = "none";
-	};
-
-	button.onclick = function () {
-		if (vsAi.checked) configuration.gameType = "ai";
-		else configuration.gameType = "player";
-
-		if (document.getElementById("color-light").checked)
-			configuration.playerColor = 2;
-		else configuration.playerColor = 1;
-
-		configuration.aiDifficulty = document.getElementById("ai-difficulty").value;
-
-		let depth = 0;
-		switch (configuration.aiDifficulty) {
-			case "easy":
-				depth = 1;
-				break;
-			case "moderate":
-				depth = 2;
-				break;
-			case "hard":
-				depth = 3;
-				break;
-			case "hardcore":
-				depth = 4;
-				break;
-		}
-
-		enemy = new AIPlayer(depth, invertType(configuration.playerColor));
-
-		setupBoard();
-
-		switchPanel(2);
-
-		startGame();
-	};
-}
-
-function setupInstructions() {
-	/* Getting the references for each button*/
-	let instButton = document.getElementById("inst-button");
-	let nextButton = document.getElementById("inst-next");
-	let prevButton = document.getElementById("inst-prev");
-	let closeButton = document.getElementById("close-button-inst");
-
-	/* This array shall hold the all diferent references for the instruction pages*/
-	let instBox = new Array();
-
-	/* As the name implies, it holds the possition in the instruction manual, as well
-        as the first and last page number. If we want to add more pages its as simple
-        as changing the value of instLastPage!!! */
-	let instCurPage;
-	let instFirstPage = 1;
-	let instLastPage = 3;
-
-	/* Function to track all the instruction boxes and save it in an array. */
-	function trackInstBox() {
-		for (let i = instFirstPage; i <= instLastPage; i++) {
-			instBox[i] = document.getElementById("inst-box-" + i);
-		}
+		this.showPanel(this.currPanel);
 	}
 
-	trackInstBox();
+	setupAuthentication() {
+		let button = document.getElementById("auth-button");
+		let userName = document.getElementById("userName");
+		let userPass = document.getElementById("userPass");
 
-	/* Funtion to remove all pages from the screen */
-	function resetPages() {
-		for (let i = instFirstPage; i <= instLastPage; i++) {
-			instBox[i].style.display = "none";
+		button.onclick = () =>
+			this.client.tryConnecting(userName.value, userPass.value);
+	}
+
+	connectInterface() {
+		this.switchPanel(6);
+	}
+
+	connectFailInterface() {
+		this.switchPanel(0);
+	}
+
+	connectSuccessInterface() {
+		this.switchPanel(1);
+	}
+
+	setupConfiguration() {
+		let button = document.getElementById("config-button");
+		let vsAi = document.getElementById("vs-ai");
+		let vsPlayer = document.getElementById("vs-player");
+		let aiDifficultySection = document.getElementById("ai-difficulty-section");
+		let playerShit = document.getElementById("player-shit");
+
+		vsAi.onchange = function () {
+			aiDifficultySection.style.display = "flex";
+			playerShit.style.display = "flex";
+		};
+
+		vsPlayer.onchange = function () {
+			aiDifficultySection.style.display = "none";
+			playerShit.style.display = "none";
+		};
+
+		button.onclick = () => {
+			if (vsAi.checked) this.configuration.gameType = "ai";
+			else {
+				this.configuration.gameType = "player";
+				this.client.findOpponent();
+				return;
+			}
+
+			if (document.getElementById("color-light").checked)
+				this.configuration.playerColor = 2;
+			else this.configuration.playerColor = 1;
+
+			this.configuration.aiDifficulty = document.getElementById(
+				"ai-difficulty"
+			).value;
+
+			let depth = 0;
+			switch (this.configuration.aiDifficulty) {
+				case "easy":
+					depth = 1;
+					break;
+				case "moderate":
+					depth = 2;
+					break;
+				case "hard":
+					depth = 3;
+					break;
+				case "hardcore":
+					depth = 4;
+					break;
+			}
+
+			this.client.playOffline(
+				depth,
+				this.configuration.playerColor == 1 ? 2 : 1
+			);
+		};
+	}
+
+	findOpponentInterface() {
+		this.switchPanel(7);
+	}
+
+	foundOpponetInterface() {
+		this.setupBoard();
+		this.switchPanel(2);
+	}
+
+	setupInstructions() {
+		/* Getting the references for each button*/
+		let instButton = document.getElementById("inst-button");
+		let nextButton = document.getElementById("inst-next");
+		let prevButton = document.getElementById("inst-prev");
+		let closeButton = document.getElementById("close-button-inst");
+
+		/* This array shall hold the all diferent references for the instruction pages*/
+		let instBox = new Array();
+
+		/* As the name implies, it holds the possition in the instruction manual, as well
+            as the first and last page number. If we want to add more pages its as simple
+            as changing the value of instLastPage!!! */
+		let instCurPage;
+		let instFirstPage = 1;
+		let instLastPage = 3;
+
+		/* Function to track all the instruction boxes and save it in an array. */
+		function trackInstBox() {
+			for (let i = instFirstPage; i <= instLastPage; i++) {
+				instBox[i] = document.getElementById("inst-box-" + i);
+			}
 		}
-	}
 
-	/* Function to add a page to the current screen */
-	function instSwitchPage(current) {
-		resetPages();
-		instBox[current].style.display = "flex";
-		instButtonMechanic(current);
-	}
+		trackInstBox();
 
-	/* Button mechanics. Its in charge of dealing with the buttons. 
-        For example, on the last page we can«t have a next button. */
-	function instButtonMechanic(current) {
-		switch (current) {
-			case instFirstPage:
-				prevButton.style.display = "none";
-				nextButton.style.display = "block";
-				break;
-
-			case instLastPage:
-				prevButton.style.display = "block";
-				nextButton.style.display = "none";
-				break;
-
-			default:
-				prevButton.style.display = "block";
-				nextButton.style.display = "block";
+		/* Funtion to remove all pages from the screen */
+		function resetPages() {
+			for (let i = instFirstPage; i <= instLastPage; i++) {
+				instBox[i].style.display = "none";
+			}
 		}
-	}
 
-	instCurPage = instFirstPage;
-	instSwitchPage(instFirstPage);
+		/* Function to add a page to the current screen */
+		function instSwitchPage(current) {
+			resetPages();
+			instBox[current].style.display = "flex";
+			instButtonMechanic(current);
+		}
 
-	/* What to do when a certain reference is clicked on */
-	instButton.onclick = function () {
-		showPanel(3, true);
-	};
+		/* Button mechanics. Its in charge of dealing with the buttons. 
+            For example, on the last page we can«t have a next button. */
+		function instButtonMechanic(current) {
+			switch (current) {
+				case instFirstPage:
+					prevButton.style.display = "none";
+					nextButton.style.display = "block";
+					break;
 
-	nextButton.onclick = function () {
-		instCurPage++;
-		instSwitchPage(instCurPage);
-	};
+				case instLastPage:
+					prevButton.style.display = "block";
+					nextButton.style.display = "none";
+					break;
 
-	prevButton.onclick = function () {
-		instCurPage--;
-		instSwitchPage(instCurPage);
-	};
+				default:
+					prevButton.style.display = "block";
+					nextButton.style.display = "block";
+			}
+		}
 
-	closeButton.onclick = function () {
 		instCurPage = instFirstPage;
 		instSwitchPage(instFirstPage);
-		hidePanel(3, true);
-	};
-}
 
-function setupHighScore() {
-	let closeButton = document.getElementById("close-button-hs");
-	let highScore = document.getElementById("highScore-button");
+		/* What to do when a certain reference is clicked on */
+		instButton.onclick = () => {
+			this.showPanel(3, true);
+		};
 
-	highScore.onclick = function () {
-		showPanel(4, true);
-	};
+		nextButton.onclick = () => {
+			instCurPage++;
+			instSwitchPage(instCurPage);
+		};
 
-	closeButton.onclick = function () {
-		document.getElementById("won-text").style.display = "none";
-		document.getElementById("lost-text").style.display = "none";
-		hidePanel(4, true);
-	};
-}
+		prevButton.onclick = () => {
+			instCurPage--;
+			instSwitchPage(instCurPage);
+		};
 
-function setupGame() {
-	let manual = document.getElementById("manual-icon");
-	let ranking = document.getElementById("ranking-icon");
-	let forfeit = document.getElementById("forfeit-flag");
-	let skip = document.getElementById("skip-icon");
+		closeButton.onclick = () => {
+			instCurPage = instFirstPage;
+			instSwitchPage(instFirstPage);
+			this.hidePanel(3, true);
+		};
+	}
 
-	manual.onclick = function () {
-		showPanel(3, true);
-	};
+	setupHighScore() {
+		let closeButton = document.getElementById("close-button-hs");
+		let highScore = document.getElementById("highScore-button");
 
-	ranking.onclick = function () {
-		showPanel(4, true);
-	};
+		highScore.onclick = () => {
+			this.showPanel(4, true);
+		};
 
-	forfeit.onclick = function () {
-		showConfirmationDialog(
-			"Forfeit",
-			"Are you sure you want to forfeit?",
-			function () {
-				if (configuration.playerColor === 1) {
-					currentBoard.dark = 0;
-				} else {
-					currentBoard.light = 0;
-				}
+		closeButton.onclick = () => {
+			document.getElementById("won-text").style.display = "none";
+			document.getElementById("lost-text").style.display = "none";
+			this.hidePanel(4, true);
+		};
+	}
 
-				endGame();
+	setupBoard() {
+		let board = document.getElementById("board");
+
+		board.innerHTML = "";
+
+		for (let i = 0; i < 8; i++) {
+			for (let j = 0; j < 8; j++) {
+				let cell = document.createElement("div");
+				cell.className = "cell";
+				cell.id = `cell-${i}-${j}`;
+
+				let piece = document.createElement("div");
+				piece.className = "piece";
+				piece.classList.add("empty");
+
+				cell.appendChild(piece);
+
+				cell.onclick = () => {
+					this.client.playerTurn(new Point(i, j));
+				};
+
+				board.appendChild(cell);
 			}
-		);
-	};
-
-	skip.onclick = function () {
-		skip.style.display = "none";
-		currentBoard.currentPlayer = invertType(configuration.playerColor);
-		aiTurn();
-	};
-	skip.style.display = "none";
-}
-
-function setupBoard() {
-	let board = document.getElementById("board");
-
-	board.innerHTML = "";
-
-	for (let i = 0; i < 8; i++) {
-		for (let j = 0; j < 8; j++) {
-			let cell = document.createElement("div");
-			cell.className = "cell";
-			cell.id = `cell-${i}-${j}`;
-
-			let piece = document.createElement("div");
-			piece.className = "piece";
-			piece.classList.add("empty");
-
-			cell.appendChild(piece);
-
-			cell.onclick = function () {
-				playerTurn(new Point(i, j));
-			};
-
-			board.appendChild(cell);
 		}
 	}
-}
 
-function verifyButtonVisibility() {
-	let skip = document.getElementById("skip-icon");
+	processBoard(board) {
+		for (let i = 0; i < 8; i++) {
+			for (let j = 0; j < 8; j++) {
+				this.setPiece(i, j, board.getPieceName(new Point(i, j)));
+			}
+		}
 
-	if (checkStuck(configuration.playerColor)) {
-		// Show pass button
+		document.getElementById("dark-pieces").innerText = board.dark;
+		document.getElementById("light-pieces").innerText = board.light;
+		document.getElementById("empty-cells").innerText =
+			board.size * board.size - board.light - board.dark;
+	}
+
+	verifyButtonVisibility() {
+		let forfeit = document.getElementById("forfeit-flag");
+		let skip = document.getElementById("skip-icon");
+
+		// Show pass button and forfeit too
+		forfeit.style.display = "block";
 		skip.style.display = "block";
-		outputMessage(
-			"warning",
-			"No moves left. You can forfeit or pass the turn."
-		);
-	} else {
+	}
+
+	resetButtonVisibility() {
+		let forfeit = document.getElementById("forfeit-flag");
+		let skip = document.getElementById("skip-icon");
+
+		//forfeit.style.display = "none";
 		skip.style.display = "none";
 	}
-}
 
-function processBoard(board) {
-	for (let i = 0; i < 8; i++) {
-		for (let j = 0; j < 8; j++) {
-			setPiece(i, j, board.getPieceName(new Point(i, j)));
+	setPiece(i, j, type) {
+		let cell = document.getElementById(`cell-${i}-${j}`);
+		let piece = cell.firstChild;
+
+		piece.classList.remove("light");
+		piece.classList.remove("dark");
+		piece.classList.remove("empty");
+
+		switch (type) {
+			case "empty":
+				piece.classList.add("empty");
+				break;
+			case "light":
+				piece.classList.add("light");
+				break;
+			case "dark":
+				piece.classList.add("dark");
+				break;
 		}
 	}
 
-	document.getElementById("dark-pieces").innerText = board.dark;
-	document.getElementById("light-pieces").innerText = board.light;
-	document.getElementById("empty-cells").innerText =
-		board.size * board.size - board.light - board.dark;
-}
+	/* Check */
+	setupGame() {
+		let manual = document.getElementById("manual-icon");
+		let ranking = document.getElementById("ranking-icon");
+		let forfeit = document.getElementById("forfeit-flag");
+		let skip = document.getElementById("skip-icon");
 
-function setPiece(i, j, type) {
-	let cell = document.getElementById(`cell-${i}-${j}`);
-	let piece = cell.firstChild;
+		manual.onclick = () => {
+			this.showPanel(3, true);
+		};
 
-	piece.classList.remove("light");
-	piece.classList.remove("dark");
-	piece.classList.remove("empty");
+		ranking.onclick = () => {
+			this.showPanel(4, true);
+		};
 
-	switch (type) {
-		case "empty":
-			piece.classList.add("empty");
-			break;
-		case "light":
-			piece.classList.add("light");
-			break;
-		case "dark":
-			piece.classList.add("dark");
-			break;
-	}
-}
+		forfeit.onclick = () => {
+			this.showConfirmationDialog(
+				"Forfeit",
+				"Are you sure you want to forfeit?"
+			);
+		};
 
-function outputMessage(type, msg) {
-	let ref = document.getElementById("msg-box");
+		forfeit.style.display = "block";
 
-	let className = null;
-
-	/* Defining the class to be used in newElem */
-	switch (type) {
-		case "error":
-			className = "msg-style error-msg";
-			break;
-
-		case "info":
-			className = "msg-style info-msg";
-			break;
-
-		case "warning":
-			className = "msg-style warning-msg";
-			break;
+		skip.onclick = () => {
+			forfeit.style.display = "none";
+			skip.style.display = "none";
+			this.currentBoard.currentPlayer =
+				this.configuration.playerColor == 1 ? 2 : 1;
+			this.client.aiTurn();
+		};
+		skip.style.display = "none";
 	}
 
-	addTextElement(ref, "p", msg, className).scrollIntoView(true);
-}
+	outputMessage(type, msg) {
+		let ref = document.getElementById("msg-box");
 
-function addTextElement(reference, whatType, msg, whatClass = null) {
-	/* Creating a new element of type "whatType", where whatType=="p" || 
-        whatType=="h1" etc..*/
-	let newElem = document.createElement(whatType);
+		let className = null;
 
-	/* Changing the class of newElem. Previously <whatType> now <whatType class=whatClass> */
-	if (whatClass) {
-		newElem.classList = whatClass;
-	}
+		/* Defining the class to be used in newElem */
+		switch (type) {
+			case "error":
+				className = "msg-style error-msg";
+				break;
 
-	/* Adding a text node to newElem. Previousle <whatType class...></whatType> now 
-        <whatType class...>msg</whatType> */
-	newElem.appendChild(document.createTextNode(msg));
+			case "info":
+				className = "msg-style info-msg";
+				break;
 
-	/* Adding the new node created previously, aka newElem, to the end of ref */
-	reference.appendChild(newElem);
-
-	return newElem;
-}
-
-function showGameAlert(str) {
-	if (currPanel !== 2) return;
-
-	let display = document.getElementById("game-alert");
-
-	let newElem = addTextElement(display, "h1", str);
-
-	setTimeout(function () {
-		newElem.remove();
-	}, 1000);
-}
-
-function switchPanel(newPanel) {
-	hidePanel(currPanel);
-	showPanel(newPanel);
-	currPanel = newPanel;
-}
-
-function hidePanel(panel, modal = false) {
-	let boxName = getBoxName(panel);
-	document.getElementById(boxName).style.display = "none";
-
-	if (modal) {
-		hideOverlay();
-	}
-}
-
-function showPanel(panel, modal = false) {
-	let boxName = getBoxName(panel);
-	document.getElementById(boxName).style.display = "flex";
-
-	if (modal) {
-		showOverlay();
-	}
-}
-
-function hideOverlay() {
-	document.getElementById("dark-overlay").style.display = "none";
-}
-
-function showOverlay() {
-	document.getElementById("dark-overlay").style.display = "block";
-}
-
-function getBoxName(panel) {
-	switch (panel) {
-		case 0:
-			return "ident-box";
-		case 1:
-			return "config-box";
-		case 2:
-			return "game-box";
-		case 3:
-			return "inst-box";
-		case 4:
-			return "high-score-box";
-		case 5:
-			return "confirmation-dialog";
-	}
-
-	return "";
-}
-
-/* Scores */
-function Score(name, date, score) {
-	this.name = name;
-	this.date = date;
-	this.score = score;
-}
-
-function displayScores(scores) {
-	let content = "";
-	scores.sort((a, b) => b.score - a.score);
-
-	console.log(scores);
-	scores.forEach(
-		(score) =>
-			(content +=
-				"<tr><td>" +
-				score.name +
-				"</td><td>" +
-				score.date +
-				"</td><td>" +
-				score.score +
-				"</td></tr>")
-	);
-	document.getElementById("highscore-content").innerHTML = content;
-}
-
-function showConfirmationDialog(title, content, onConfirm) {
-	document.getElementById("dialog-title").innerText = title;
-	document.getElementById("dialog-content").innerText = content;
-
-	document.getElementById("cancel-button").onclick = function () {
-		hidePanel(5, true);
-	};
-
-	document.getElementById("confirm-button").onclick = function () {
-		onConfirm();
-		hidePanel(5, true);
-	};
-
-	showPanel(5, true);
-}
-
-function getTypeId(type) {
-	switch (type) {
-		case "empty":
-			type = 0;
-			break;
-		case "dark":
-			type = 1;
-			break;
-		case "light":
-			type = 2;
-			break;
-	}
-	return type;
-}
-
-function endGame() {
-	if (configuration.gameType === "ai") {
-		let playerScore = currentBoard.score(configuration.playerColor);
-		let aiScore = currentBoard.score(invertType(configuration.playerColor));
-
-		let date = new Date();
-		let scores = [
-			new Score("Player", date.toLocaleDateString(), playerScore),
-			new Score("AI", date.toLocaleDateString(), aiScore),
-		];
-
-		// Setup the scores
-		displayScores(scores);
-		if (playerScore > aiScore) {
-			document.getElementById("won-text").style.display = "inline";
-		} else if (playerScore < aiScore) {
-			document.getElementById("lost-text").style.display = "inline";
+			case "warning":
+				className = "msg-style warning-msg";
+				break;
 		}
 
-		// Go back to configuration
-		switchPanel(1);
+		this.addTextElement(ref, "p", msg, className).scrollIntoView(true);
+	}
 
-		// Show highscores
-		showPanel(4, true);
-	} else {
-		// Multiplayer
+	addTextElement(reference, whatType, msg, whatClass = null) {
+		/* Creating a new element of type "whatType", where whatType=="p" || 
+            whatType=="h1" etc..*/
+		let newElem = document.createElement(whatType);
+
+		/* Changing the class of newElem. Previously <whatType> now <whatType class=whatClass> */
+		if (whatClass) {
+			newElem.classList = whatClass;
+		}
+
+		/* Adding a text node to newElem. Previousle <whatType class...></whatType> now 
+            <whatType class...>msg</whatType> */
+		newElem.appendChild(document.createTextNode(msg));
+
+		/* Adding the new node created previously, aka newElem, to the end of ref */
+		reference.appendChild(newElem);
+
+		return newElem;
+	}
+
+	showGameAlert(str) {
+		if (this.currPanel !== 2) return;
+
+		let display = document.getElementById("game-alert");
+
+		let newElem = this.addTextElement(display, "h1", str);
+
+		setTimeout(function () {
+			newElem.remove();
+		}, 1000);
+	}
+
+	showGame() {
+		this.switchPanel(2);
+	}
+
+	switchPanel(newPanel) {
+		this.hidePanel(this.currPanel);
+		this.showPanel(newPanel);
+		this.currPanel = newPanel;
+	}
+
+	hidePanel(panel, modal = false) {
+		let boxName = this.getBoxName(panel);
+		document.getElementById(boxName).style.display = "none";
+
+		if (modal) {
+			this.hideOverlay();
+		}
+	}
+
+	showPanel(panel, modal = false) {
+		let boxName = this.getBoxName(panel);
+		document.getElementById(boxName).style.display = "flex";
+
+		if (modal) {
+			this.showOverlay();
+		}
+	}
+
+	hideOverlay() {
+		document.getElementById("dark-overlay").style.display = "none";
+	}
+
+	showOverlay() {
+		document.getElementById("dark-overlay").style.display = "block";
+	}
+
+	getBoxName(panel) {
+		switch (panel) {
+			case 0:
+				return "ident-box";
+			case 1:
+				return "config-box";
+			case 2:
+				return "game-box";
+			case 3:
+				return "inst-box";
+			case 4:
+				return "high-score-box";
+			case 5:
+				return "confirmation-dialog";
+			case 6:
+				return "connecting-box";
+			case 7:
+				return "wait-opponent";
+		}
+
+		return "";
+	}
+
+	displayScores(scores) {
+		let content = "";
+		scores.sort((a, b) => b.score - a.score);
+
+		console.log(scores);
+		scores.forEach(
+			(score) =>
+				(content +=
+					"<tr><td>" +
+					score.name +
+					"</td><td>" +
+					score.date +
+					"</td><td>" +
+					score.score +
+					"</td></tr>")
+		);
+		document.getElementById("highscore-content").innerHTML = content;
+	}
+
+	showConfirmationDialog(title, content) {
+		document.getElementById("dialog-title").innerText = title;
+		document.getElementById("dialog-content").innerText = content;
+
+		document.getElementById("cancel-button").onclick = () => {
+			this.hidePanel(5, true);
+			document.getElementById("forfeit-flag").display = "block";
+		};
+
+		document.getElementById("confirm-button").onclick = () => {
+			this.hidePanel(5, true);
+			this.client.forfeit();
+		};
+
+		this.showPanel(5, true);
+	}
+
+	getTypeId(type) {
+		switch (type) {
+			case "empty":
+				type = 0;
+				break;
+			case "dark":
+				type = 1;
+				break;
+			case "light":
+				type = 2;
+				break;
+		}
+		return type;
 	}
 }
