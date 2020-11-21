@@ -1,54 +1,57 @@
 class AIPlayer {
-    constructor(maxDepth, type) {
-        this.maxDepth = maxDepth;
-        this.type = type;
-    }
+	constructor(maxDepth, type) {
+		this.maxDepth = maxDepth;
+		this.type = type;
+	}
 
-    // Wrapper for simple usage
-    calculateNextMove(board) {
-        return this._minimax(board);
-    }
+	// Wrapper for simple usage
+	calculateNextMove(board) {
+		return this._minimax(board);
+	}
 
-    invertType(type) { return type == 1 ? 2: 1;}
-    
-    _minimax(board, depth = 0, playing = true, alpha = -100000, beta = 100000) {
-        if (depth >= this.maxDepth) {
-            return board.score(this.type) - board.score(this.invertType(this.type));
-        }
+	invertType(type) {
+		return type == 1 ? 2 : 1;
+	}
 
-        let moves = board.getPossibleMoves(playing ? this.type : this.invertType(this.type));
-        let bestMove;
+	_minimax(board, depth = 0, playing = true, alpha = -100000, beta = 100000) {
+		if (depth >= this.maxDepth) {
+			return board.score(this.type) - board.score(this.invertType(this.type));
+		}
 
-        if (playing) {
-            moves.some(move => {
-                let score = this._minimax(move, depth + 1, !playing, alpha, beta);
+		let moves = board.getPossibleMoves(
+			playing ? this.type : this.invertType(this.type)
+		);
+		let bestMove;
 
-                if (score > alpha) {
-                    alpha = score;
-                    bestMove = move;
-                }
+		if (playing) {
+			moves.some((move) => {
+				let score = this._minimax(move, depth + 1, !playing, alpha, beta);
 
-                return (beta <= alpha);
-            });
+				if (score > alpha) {
+					alpha = score;
+					bestMove = move;
+				}
 
-            if (depth === 0) {
-                return bestMove;
-            } else {
-                return alpha;
-            }
+				return beta <= alpha;
+			});
 
-        } else {
-            moves.some(move => {
-                let score = this._minimax(move, depth + 1, !playing, alpha, beta);
+			if (depth === 0) {
+				return bestMove;
+			} else {
+				return alpha;
+			}
+		} else {
+			moves.some((move) => {
+				let score = this._minimax(move, depth + 1, !playing, alpha, beta);
 
-                if (score < beta) {
-                    beta = score;
-                }
+				if (score < beta) {
+					beta = score;
+				}
 
-                return (beta <= alpha);
-            });
+				return beta <= alpha;
+			});
 
-            return beta;
-        }
-    }
+			return beta;
+		}
+	}
 }
