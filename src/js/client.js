@@ -1,16 +1,16 @@
 class Client {
-	constructor() {
+	constructor(group) {
 		this.name = null;
 		this.pass = null;
 
 		/* Replace with our group number */
-		this.group = 999;
+		this.group = group;
 
 		/* Server name */
-		this.server = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+		this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
 
-		/* Game Hash Code */
-		this.gameCode = null;
+		/* Match Id */
+		this.matchId = null;
 
 		/* Game piece color */
 		this.color = null;
@@ -18,78 +18,95 @@ class Client {
 		/* Server Source */
 		this.eventSource = null;
 
-		this.inter = new Interface(this);
+		/* Game Object (either OnlineGame or AiGame) */
+		this.game = null;
+
+		this.ui = new UI(this);
 	}
 
-	executeCommandRegister() {
-		this.executeCommand(this.server + "register", {
-			nick: this.name,
-			pass: this.pass,
+	authenticate(username, password) {
+		if (username === "" && password === "") {
+			this.ui.showGameAlert("Name or Password empty.");
+			return;
+		}
+
+		this.ui.showGameAlert("Connecting...", true);
+
+		this.sendRequest("register", {
+			nick: username,
+			pass: password,
 		})
-			.then((data) => {
-				this.checkConnectionResponse(data);
+			.then((res) => {
+				this.ui.hideGameAlerts();
+				if ("error" in res) {
+					this.ui.showGameAlert("Invalid name/password combination.");
+					console.log(res.error);
+				} else {
+					this.name = username;
+					this.pass = password;
+					this.ui.showConfiguration();
+				}
 			})
-			.catch((data) => {
-				console.log(data);
-				this.connectionFail();
+			.catch((err) => {
+				this.ui.hideGameAlerts();
+
+				console.log(err);
+				this.connectionFailed();
 			});
 	}
 
-	tryConnecting(userName, userPass) {
-		this.name = userName;
-		this.pass = userPass;
-
-		this.executeCommandRegister();
-	}
-
-	checkConnectionResponse(data) {
-		if ("error" in data) this.connectionFail();
-		else this.inter.connectSuccessInterface();
-	}
-
-	connectionFail() {
-		console.log("Connection failed: User=" + this.name + " pass=" + this.pass);
+	connectionFailed() {
+		console.log("Connection Failed: User=" + this.name + " Pass=" + this.pass);
 		this.name = null;
 		this.pass = null;
 
-		this.inter.connectFailInterface();
+		this.ui.showAuthentication();
 	}
 
-	executeCommandJoin() {
-		this.executeCommand(this.server + "join", {
+	join() {
+		this.sendRequest("join", {
 			group: this.group,
 			nick: this.name,
 			pass: this.pass,
 		})
-			.then((data) => {
-				this.gameCode = data.game;
-				this.color = data.color;
-				this.listenToServer();
-				console.log(data);
+			.then((res) => {
+				if ("error" in res) {
+					console.log(res.error);
+					this.ui.stopWaiting(true);
+				} else {
+					this.matchId = res.game;
+					this.color = res.color;
+					this.startListening();
+				}
 			})
-			.catch(console.log);
+			.catch((err) => {
+				console.log(err);
+				this.ui.stopWaiting(true);
+			});
 	}
 
 	findOpponent() {
-		this.inter.findOpponentInterface();
-
-		this.executeCommandJoin();
+		this.ui.waitForOpponent();
+		this.join();
 	}
 
-	listenToServer() {
-		if (this.eventSource != null) this.ignoreServer();
+	startListening() {
+		if (this.eventSource != null) this.stopListening();
 
 		let url =
-			this.server + "update?nick=" + this.name + "&game=" + this.gameCode;
-		console.log(url);
+			this.serverURL + "update?nick=" + this.name + "&game=" + this.matchId;
 		this.eventSource = new EventSource(url);
 
 		this.eventSource.onmessage = (event) => {
 			const data = JSON.parse(event.data);
-			console.log(data);
 
-			if (this.inter.currPanel == 7 && data.board != undefined)
-				this.inter.foundOpponetInterface();
+			if ("board" in data) {
+				if (this.ui.isWaiting()) {
+					this.playOnline();
+				}
+
+				this.game.update(data.turn === this.name, data.board);
+			}
 		};
 	}
 
@@ -97,10 +114,10 @@ class Client {
 		this.executeCommand(this.server + "leave", {
 			nick: this.name,
 			pass: this.pass,
-			game: this.gameCode,
+			game: this.matchId,
 		})
 			.then((data) => {
-				this.gameCode = null;
+				this.matchId = null;
 				this.color = null;
 				this.ignoreServer();
 			})
@@ -108,56 +125,51 @@ class Client {
 	}
 
 	forfeit() {
-		if (this.aiGame != null) this.aiGame.forfeit();
-		else {
-			this.executeCommandLeave();
-		}
+		this.game.forfeit();
 	}
 
-	ignoreServer() {
+	stopListening() {
 		this.eventSource.close();
 		this.eventSource = null;
 	}
 
-	executeCommandRanking() {
-		this.executeCommand(this.server + "ranking")
-			.then((data) => console.log(data))
-			.catch(console.log);
+	getRanking() {
+		this.sendRequest("ranking")
+			.then((res) => console.log(res))
+			.catch((err) => {
+				console.log(err);
+				this.ui.showGameAlert("Error retrieving ranking data.");
+			});
 	}
 
-	executeCommandNotify(move) {
-		this.executeCommand(this.server + "notify", {
+	async notify(move) {
+		return this.sendRequest("notify", {
 			nick: this.name,
 			pass: this.pass,
-			game: this.gameCode,
+			game: this.matchId,
 			move: move,
-		})
-			.then((data) => validatePlay(data))
-			.catch(console.log);
+		});
 	}
 
 	playOffline(depth, color) {
-		this.aiGame = new AiGame(depth, color, this.inter);
+		this.game = new AiGame(depth, color, this.ui);
+	}
+
+	playOnline(color) {
+		this.ui.stopWaiting();
+		this.game = new OnlineGame(color, this.ui, this);
 	}
 
 	playerTurn(point) {
-		if (this.aiGame != null) {
-			this.aiGame.playerTurn(point);
-
-			this.aiGame.checkPlayerStuck();
-		}
+		this.game.playerTurn(point);
 	}
 
-	async executeCommand(url, content = {}) {
-		const response = await fetch(url, {
-			method: "POST",
+	async sendRequest(endpoint, content = {}, method = "POST") {
+		let res = await fetch(this.serverURL + endpoint, {
+			method: method,
 			body: JSON.stringify(content),
 		});
 
-		return response.json();
+		return res.json();
 	}
 }
-
-window.onload = function () {
-	const client = new Client("test123", "test123");
-};
