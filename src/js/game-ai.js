@@ -9,17 +9,13 @@ class AIPlayer {
 		return this._minimax(board);
 	}
 
-	invertType(type) {
-		return type == 1 ? 2 : 1;
-	}
-
 	_minimax(board, depth = 0, playing = true, alpha = -100000, beta = 100000) {
 		if (depth >= this.maxDepth) {
-			return board.score(this.type) - board.score(this.invertType(this.type));
+			return board.score(this.type) - board.score(Board.invertType(this.type));
 		}
 
 		let moves = board.getPossibleMoves(
-			playing ? this.type : this.invertType(this.type)
+			playing ? this.type : Board.invertType(this.type)
 		);
 		let bestMove;
 

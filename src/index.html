@@ -7,8 +7,9 @@
         <link rel="stylesheet" href="css/styles.css" />
         <script src="js/game-ai.js"></script>
         <script src="js/game.js"></script>
-        <script src="js/main.js"></script>
         <script src="js/client.js"></script>
+        <script src="js/ui.js"></script>
+        <script src="js/main.js"></script>
     </head>
 
     <body>
@@ -27,18 +28,13 @@
                 <h1>Authentication</h1>
 
                 <div class="user-pass">
-                    <input id="userName" type="text" placeholder="Login">
-                    <input id="userPass" type="password" placeholder="Password">
+                    <input id="username" type="text" placeholder="Login">
+                    <input id="userpass" type="password" placeholder="Password">
                 </div>
 
                 <div class="button" id="auth-button">
                     <p>Enter</p>
                 </div>
-            </div>
-
-            <!-- Connecting -->
-            <div id="connecting-box" class="panel">
-                <h1>Connecting</h1>
             </div>
 
             <!-- Configuration -->
@@ -215,9 +211,9 @@
             </div>
 
             <!-- Wait for opponent-->
-            <dib id="wait-opponent" class="panel">
-                <h1>Waiting for opponent</h1>
-            </dib>
+            <div id="wait-opponent" class="panel modal">
+                <h1>Waiting for opponent...</h1>
+            </div>
 
             <!-- Game Alert-->
             <div class="panel modal no-background" id="game-alert"></div>
