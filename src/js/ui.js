@@ -49,10 +49,6 @@ class UI {
 		this._switchPanel(1);
 	}
 
-	showScores() {
-		this._showPanel(4, true);
-	}
-
 	setupConfiguration() {
 		let button = document.getElementById("config-button");
 		let vsAi = document.getElementById("vs-ai");
@@ -219,12 +215,13 @@ class UI {
 		let highScore = document.getElementById("highScore-button");
 
 		highScore.onclick = () => {
-			this._showPanel(4, true);
+			this.client.ranking();
 		};
 
 		closeButton.onclick = () => {
 			document.getElementById("won-text").style.display = "none";
 			document.getElementById("lost-text").style.display = "none";
+			document.getElementById("tie-text").style.display = "none";
 			this._hidePanel(4, true);
 		};
 	}
@@ -306,7 +303,6 @@ class UI {
 		}
 	}
 
-	/* Check */
 	setupGame() {
 		let manual = document.getElementById("manual-icon");
 		let ranking = document.getElementById("ranking-icon");
@@ -318,7 +314,7 @@ class UI {
 		};
 
 		ranking.onclick = () => {
-			this._showPanel(4, true);
+			this.client.ranking();
 		};
 
 		forfeit.onclick = () => {
@@ -362,7 +358,7 @@ class UI {
 
 		this.addTextElement(ref, "p", msg, className).scrollIntoView(true);
 	}
-
+	
 	addTextElement(reference, whatType, msg, whatClass = null) {
 		/* Creating a new element of type "whatType", where whatType=="p" || 
             whatType=="h1" etc..*/
@@ -460,20 +456,20 @@ class UI {
 
 	displayScores(scores) {
 		let content = "";
-		scores.sort((a, b) => b.score - a.score);
 
-		scores.forEach(
-			(score) =>
-				(content +=
-					"<tr><td>" +
-					score.name +
-					"</td><td>" +
-					score.date +
-					"</td><td>" +
-					score.score +
-					"</td></tr>")
+		scores.forEach((score) =>
+			(content +=
+				"<tr><td>" +
+				score.nick +
+				"</td><td>" +
+				score.victories +
+				"</td><td>" +
+				score.games +
+				"</td></tr>")
 		);
 		document.getElementById("highscore-content").innerHTML = content;
+
+		this._showPanel(4, true);
 	}
 
 	showConfirmationDialog(title, content) {
@@ -488,6 +484,7 @@ class UI {
 		document.getElementById("confirm-button").onclick = () => {
 			this._hidePanel(5, true);
 			this.client.forfeit();
+			console.log("passed");
 		};
 
 		this._showPanel(5, true);
@@ -506,5 +503,17 @@ class UI {
 				break;
 		}
 		return type;
+	}
+
+	wonConclusion(){
+		document.getElementById("won-text").style.display = "inline";
+	}
+
+	loseConclusion() {
+		document.getElementById("lost-text").style.display = "inline";
+	}
+
+	tieConclusion() {
+		document.getElementById("tie-text").style.display = "inline";
 	}
 }

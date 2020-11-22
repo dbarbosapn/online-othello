@@ -82,12 +82,6 @@ class Board {
 		this.addPiece(2, point.addPoint(new Point(1, 0)));
 	}
 
-	arrayToBoard(array) {
-		for (let i = 0; i < 8; i++) {
-			for (let j = 0; j < 8; j++) {}
-		}
-	}
-
 	/* This method adds a piece in possition "point". It does not check
         if it's occupied. It does however increse the counter of light and dark pieces */
 	addPiece(type, point) {
@@ -269,6 +263,10 @@ class Board {
 				this.noMove(this.currentPlayer === 1 ? 2 : 1))
 		);
 	}
+
+	forfeit() {
+		this.client.leave();
+	}
 }
 
 class OnlineGame {
@@ -304,8 +302,7 @@ class OnlineGame {
 	}
 
 	playerTurn(point) {
-		this.client
-			.notify({
+		this.client.notify({
 				row: point.x,
 				column: point.y,
 			})
@@ -313,9 +310,7 @@ class OnlineGame {
 				if ("error" in res) {
 					console.log(res.error);
 
-					if (this.playerColor !== this.currentBoard.currentPlayer)
-						this.ui.outputMessage("info", "Wait for your turn, please.");
-					else this.ui.outputMessage("error", "Invalid move.");
+					this.checkPossibleErrors(res.error);
 				}
 			})
 			.catch((err) => {
@@ -323,13 +318,50 @@ class OnlineGame {
 				this.ui.outputMessage("error", "An unknown error occurred.");
 			});
 	}
+
+	checkPossibleErrors(error)
+	{	
+		/* Jesus, I AM NOT going to deal with enconding types in js */
+		if ( error === "Not your turn to play" )
+			this.ui.outputMessage("info", "Wait for your turn, please.");
+
+		/* js breaks down because 'ç' is an utf8+ character */
+		else if ( error.includes("Nenhuma") || error.includes("preenchida") )
+			this.ui.outputMessage("error", "Invalid move");
+
+		else
+			this.ui.outputMessage("warning", "Somethin went wrong. Try again");
+	}
+
+	endGame(winner) {
+		if ( winner == null )
+			this.ui.tieConclusion();
+
+		else if ( winner === this.client.name )
+			this.ui.wonConclusion();
+
+		else
+			this.ui.loseConclusion();
+
+		// Go back to configuration
+		this.ui.showConfiguration();
+	
+		// Show highscores
+		this.client.ranking(true);
+
+	}
+
+	forfeit() {
+		this.client.leave();
+	}
 }
 
 class AiGame {
-	constructor(depth, color, ui) {
+	constructor(depth, color, ui, client) {
 		this.aiColor = color;
 		this.playerColor = color === 1 ? 2 : 1;
 		this.ui = ui;
+		this.client = client;
 
 		/* Initialization of the board */
 		this.currentBoard = new Board();
@@ -419,29 +451,24 @@ class AiGame {
 		);
 	}
 
+	/* Change highScore */
 	endGame() {
 		let playerScore = this.currentBoard.score(this.playerColor);
 		let aiScore = this.currentBoard.score(this.playerColor == 1 ? 2 : 1);
 
-		let date = new Date();
-		let scores = [
-			{ name: "Player", date: date.toLocaleDateString(), score: playerScore },
-			{ name: "Ai", date: date.toLocaleDateString(), score: aiScore },
-		];
-
-		// Setup the scores
-		this.ui.displayScores(scores);
 		if (playerScore > aiScore) {
-			document.getElementById("won-text").style.display = "inline";
+			this.ui.wonConclusion();
 		} else if (playerScore < aiScore) {
-			document.getElementById("lost-text").style.display = "inline";
+			this.ui.loseConclusion();
+		} else {
+			this.ui.tieConclusion();
 		}
 
 		// Go back to configuration
 		this.ui.showConfiguration();
 
 		// Show highscores
-		this.ui.showScores();
+		this.client.ranking();
 	}
 
 	forfeit() {
