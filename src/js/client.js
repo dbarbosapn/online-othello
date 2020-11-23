@@ -103,18 +103,16 @@ class Client {
 
 			console.log(data);
 
-			if ( "winner" in data ) {
-				this.gameConclusion(data.winner);
-			}
-
-			else if ("board" in data) {
+			if ("winner" in data) {
+				this.finishGame(data.winner);
+			} else if ("board" in data) {
 				if (this.ui.isWaiting()) {
 					this.playOnline();
 				}
 
 				this.game.update(data.turn === this.name, data.board);
 			}
-		}
+		};
 	}
 
 	leave() {
@@ -123,14 +121,14 @@ class Client {
 			pass: this.pass,
 			game: this.matchId,
 		})
-			.then((data) => {
+			.then((res) => {
 				this.matchId = null;
 				this.color = null;
 			})
 			.catch(console.log);
 	}
 
-	gameConclusion(winner) {
+	finishGame(winner) {
 		this.game.endGame(winner);
 	}
 
@@ -143,20 +141,20 @@ class Client {
 		this.eventSource = null;
 	}
 
-	/* This method can be called from many places, but depending on who calls
+	/*
+	  	This method can be called in different situations, but depending on who calls
 		it we need to close eventSource. 
 		Example: At the end of a game we call ranking and we need to close
 		event source, since we are going to leave.
-		During the game, we can call the highScore table and ee can 
-		continue playing, so we DONT want to close the eventSource
-		Do not erase this!! */
+		During the game, we can call the highScore table and 
+		continue playing, so we DONT want to close the eventSource.
+	 */
 	ranking(leftGame) {
 		this.sendRequest("ranking")
 			.then((res) => {
-				this.ui.displayScores(res.ranking)
+				this.ui.displayScores(res.ranking);
 
-				if ( leftGame )
-					this.stopListening();
+				if (leftGame) this.stopListening();
 			})
 			.catch((err) => {
 				console.log(err);

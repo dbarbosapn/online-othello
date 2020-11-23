@@ -298,11 +298,14 @@ class OnlineGame {
 			? this.playerColor
 			: Board.invertType(this.playerColor);
 
+		if (play) this.ui.showGameAlert("Your turn!");
+
 		this.ui.processBoard(this.currentBoard);
 	}
 
 	playerTurn(point) {
-		this.client.notify({
+		this.client
+			.notify({
 				row: point.x,
 				column: point.y,
 			})
@@ -319,36 +322,25 @@ class OnlineGame {
 			});
 	}
 
-	checkPossibleErrors(error)
-	{	
-		/* Jesus, I AM NOT going to deal with enconding types in js */
-		if ( error === "Not your turn to play" )
+	checkPossibleErrors(error) {
+		// Note: Should be careful with encoding
+		if (error === "Not your turn to play")
 			this.ui.outputMessage("info", "Wait for your turn, please.");
-
-		/* js breaks down because 'ç' is an utf8+ character */
-		else if ( error.includes("Nenhuma") || error.includes("preenchida") )
+		else if (error.includes("Nenhuma") || error.includes("preenchida"))
 			this.ui.outputMessage("error", "Invalid move");
-
-		else
-			this.ui.outputMessage("warning", "Somethin went wrong. Try again");
+		else this.ui.outputMessage("warning", "Something went wrong. Try again");
 	}
 
 	endGame(winner) {
-		if ( winner == null )
-			this.ui.tieConclusion();
-
-		else if ( winner === this.client.name )
-			this.ui.wonConclusion();
-
-		else
-			this.ui.loseConclusion();
+		if (winner == null) this.ui.tieConclusion();
+		else if (winner === this.client.name) this.ui.wonConclusion();
+		else this.ui.loseConclusion();
 
 		// Go back to configuration
 		this.ui.showConfiguration();
-	
+
 		// Show highscores
 		this.client.ranking(true);
-
 	}
 
 	forfeit() {
