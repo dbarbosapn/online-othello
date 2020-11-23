@@ -213,11 +213,9 @@ th {
 	color: #2c3e50;
 }
 
-#won-text {
-	display: none;
-}
-
-#lost-text {
+#won-text,
+#lost-text,
+#tie-text {
 	display: none;
 }
 

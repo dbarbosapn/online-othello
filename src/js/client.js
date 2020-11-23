@@ -76,6 +76,7 @@ class Client {
 				} else {
 					this.matchId = res.game;
 					this.color = res.color;
+					console.log(this.matchId);
 					this.startListening();
 				}
 			})
@@ -100,7 +101,11 @@ class Client {
 		this.eventSource.onmessage = (event) => {
 			const data = JSON.parse(event.data);
 
-			if ("board" in data) {
+			console.log(data);
+
+			if ("winner" in data) {
+				this.finishGame(data.winner);
+			} else if ("board" in data) {
 				if (this.ui.isWaiting()) {
 					this.playOnline();
 				}
@@ -110,18 +115,21 @@ class Client {
 		};
 	}
 
-	executeCommandLeave() {
-		this.executeCommand(this.server + "leave", {
+	leave() {
+		this.sendRequest("leave", {
 			nick: this.name,
 			pass: this.pass,
 			game: this.matchId,
 		})
-			.then((data) => {
+			.then((res) => {
 				this.matchId = null;
 				this.color = null;
-				this.ignoreServer();
 			})
 			.catch(console.log);
+	}
+
+	finishGame(winner) {
+		this.game.endGame(winner);
 	}
 
 	forfeit() {
@@ -133,9 +141,21 @@ class Client {
 		this.eventSource = null;
 	}
 
-	getRanking() {
+	/*
+	  	This method can be called in different situations, but depending on who calls
+		it we need to close eventSource. 
+		Example: At the end of a game we call ranking and we need to close
+		event source, since we are going to leave.
+		During the game, we can call the highScore table and 
+		continue playing, so we DONT want to close the eventSource.
+	 */
+	ranking(leftGame) {
 		this.sendRequest("ranking")
-			.then((res) => console.log(res))
+			.then((res) => {
+				this.ui.displayScores(res.ranking);
+
+				if (leftGame) this.stopListening();
+			})
 			.catch((err) => {
 				console.log(err);
 				this.ui.showGameAlert("Error retrieving ranking data.");
@@ -152,7 +172,7 @@ class Client {
 	}
 
 	playOffline(depth, color) {
-		this.game = new AiGame(depth, color, this.ui);
+		this.game = new AiGame(depth, color, this.ui, this);
 	}
 
 	playOnline(color) {

@@ -1,222 +1,299 @@
 <!DOCTYPE html>
 
 <html lang="pt">
-    <head>
-        <title>Othello</title>
+	<head>
+		<title>Othello</title>
 
-        <link rel="stylesheet" href="css/styles.css" />
-        <script src="js/game-ai.js"></script>
-        <script src="js/game.js"></script>
-        <script src="js/client.js"></script>
-        <script src="js/ui.js"></script>
-        <script src="js/main.js"></script>
-    </head>
+		<link rel="stylesheet" href="css/styles.css" />
+		<script src="js/game-ai.js"></script>
+		<script src="js/game.js"></script>
+		<script src="js/client.js"></script>
+		<script src="js/ui.js"></script>
+		<script src="js/main.js"></script>
+	</head>
 
-    <body>
-        <div class="container">
+	<body>
+		<div class="container">
+			<div id="dark-overlay"></div>
 
-            <div id="dark-overlay"></div>
+			<!-- Always Visible -->
+			<div class="image-holder center">
+				<img alt="Othelho Image" src="img/othello.png" />
+				<h1>Othello</h1>
+			</div>
 
-            <!-- Always Visible -->
-            <div class="image-holder center">
-                <img alt="Othelho Image" src="img/othello.png">
-                <h1>Othello</h1>
-            </div>
+			<!-- Login -->
+			<div id="ident-box" class="panel">
+				<h1>Authentication</h1>
 
-            <!-- Login -->
-            <div id="ident-box" class="panel">
-                <h1>Authentication</h1>
+				<div class="user-pass">
+					<input id="username" type="text" placeholder="Login" />
+					<input id="userpass" type="password" placeholder="Password" />
+				</div>
 
-                <div class="user-pass">
-                    <input id="username" type="text" placeholder="Login">
-                    <input id="userpass" type="password" placeholder="Password">
-                </div>
+				<div class="button" id="auth-button">
+					<p>Enter</p>
+				</div>
+			</div>
 
-                <div class="button" id="auth-button">
-                    <p>Enter</p>
-                </div>
-            </div>
+			<!-- Configuration -->
+			<div id="config-box" class="panel">
+				<h1>Configuration</h1>
 
-            <!-- Configuration -->
-            <div id="config-box" class="panel" >
-                <h1>Configuration</h1>
-            
-                <div class="configuration">
-                    <div class="config-section">
-                        <h3>Game Type</h3>
-                        <label for="vs-ai">
-                            Player vs AI <input type="radio" id="vs-ai" name="game-type" value="ai" checked>
-                        </label>
-                        <br/>
-                        <label for="vs-player">
-                            Player vs Player <input type="radio" id="vs-player" name="game-type" value="player">
-                        </label>
-                    </div>
+				<div class="configuration">
+					<div class="config-section">
+						<h3>Game Type</h3>
+						<label for="vs-ai">
+							Player vs AI
+							<input
+								type="radio"
+								id="vs-ai"
+								name="game-type"
+								value="ai"
+								checked
+							/>
+						</label>
+						<br />
+						<label for="vs-player">
+							Player vs Player
+							<input
+								type="radio"
+								id="vs-player"
+								name="game-type"
+								value="player"
+							/>
+						</label>
+					</div>
 
-                    <div class="config-section" id="player-shit">
-                        <h3>Player Color</h3>
-                        <label for="color-light">
-                            Light <input type="radio" id="color-light" name="player-color" value="light" checked>
-                        </label>
-                        <br />
-                        <label for="color-dark">
-                            Dark <input type="radio" id="color-dark" name="player-color" value="dark">
-                        </label>
-                    </div>
+					<div class="config-section" id="player-shit">
+						<h3>Player Color</h3>
+						<label for="color-light">
+							Light
+							<input
+								type="radio"
+								id="color-light"
+								name="player-color"
+								value="light"
+								checked
+							/>
+						</label>
+						<br />
+						<label for="color-dark">
+							Dark
+							<input
+								type="radio"
+								id="color-dark"
+								name="player-color"
+								value="dark"
+							/>
+						</label>
+					</div>
 
-                    <div class="config-section" id="ai-difficulty-section">
-                        <h3>AI Difficulty</h3>
-                        <select name="ai-difficulty" id="ai-difficulty">
-                            <option value="easy">Easy</option>
-                            <option value="moderate">Moderate</option>
-                            <option value="hard">Hard</option>
-                            <option value="hardcore">Hardcore</option>
-                        </select>
-                    </div>
+					<div class="config-section" id="ai-difficulty-section">
+						<h3>AI Difficulty</h3>
+						<select name="ai-difficulty" id="ai-difficulty">
+							<option value="easy">Easy</option>
+							<option value="moderate">Moderate</option>
+							<option value="hard">Hard</option>
+							<option value="hardcore">Hardcore</option>
+						</select>
+					</div>
 
-                    <div class="mult-button">
-                        <div class="button" id="inst-button">
-                            <p>Instructions</p>
-                        </div>
-                        <div class="button" id="config-button">
-                            <p>Start Game!</p>
-                        </div>
-                        <div class="button" id="highScore-button">
-                            <p>High Score</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-  
-    
-            <!-- Instructions -->         
-            <div id="inst-box" class="panel modal" >
+					<div class="mult-button">
+						<div class="button" id="inst-button">
+							<p>Instructions</p>
+						</div>
+						<div class="button" id="config-button">
+							<p>Start Game!</p>
+						</div>
+						<div class="button" id="highScore-button">
+							<p>High Score</p>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                <div id="inst-box-1" class="text-box">
-                    <h1>Gameplay</h1>
+			<!-- Instructions -->
+			<div id="inst-box" class="panel modal">
+				<div id="inst-box-1" class="text-box">
+					<h1>Gameplay</h1>
 
-                    <ul>
-                        <li>Othello is a strategy board game played between 2 players. One player plays black and the other plays white.</li>
-                        <li>Each player gets 32 discs and black always starts the game.</li>
-                        <li>Then, the game alternates between white and black until:
-                            <ul>
-                                <li>one player can not make a valid move to outflank the opponent.</li>
-                                <li>both players have no valid moves.</li>
-                            </ul>
-                            When a player has no valid moves, he pass his turn and the opponent continues.
-                        </li>
-                        <li>A player can not voluntarily forfeit his turn.</li>
-                        <li>When both players can not make a valid move the game ends.</li>
-                    </ul>
-                </div>
+					<ul>
+						<li>
+							Othello is a strategy board game played between 2 players. One
+							player plays black and the other plays white.
+						</li>
+						<li>Each player gets 32 discs and black always starts the game.</li>
+						<li>
+							Then, the game alternates between white and black until:
+							<ul>
+								<li>
+									one player can not make a valid move to outflank the opponent.
+								</li>
+								<li>both players have no valid moves.</li>
+							</ul>
+							When a player has no valid moves, he pass his turn and the
+							opponent continues.
+						</li>
+						<li>A player can not voluntarily forfeit his turn.</li>
+						<li>When both players can not make a valid move the game ends.</li>
+					</ul>
+				</div>
 
-                <div id="inst-box-2" class="text-box" >
-                    <h1>Valid Moves</h1>
+				<div id="inst-box-2" class="text-box">
+					<h1>Valid Moves</h1>
 
-                    <ul>
-                        <li>Black always moves first.</li>
-                        <li>A move is made by placing a disc of the player's color on the board in a position that "out-flanks" one or more of the opponent's discs.</li>
-                        <li>A disc or row of discs is outflanked when it is surrounded at the ends by discs of the opposite color.</li>
-                        <li>All the discs which are outflanked will be flipped, even if it is to the player's advantage not to flip them.</li>
-                        <li>Discs may only be outflanked as a direct result of a move and must fall in the direct line of the disc being played.</li>
-                        <li>If you can't outflank and flip at least one opposing disc, you must pass your turn. However, if a move is available to you, you can't forfeit your turn.</li>
-                        <li>Once a disc has been placed on a square, it can never be moved to another square later in the game.</li>
-                        <li>When a player runs out of discs, but still has opportunities to outflank an opposing disc, then the opponent must give the player a disc to use.</li>
-                    </ul>
-                </div>
+					<ul>
+						<li>Black always moves first.</li>
+						<li>
+							A move is made by placing a disc of the player's color on the
+							board in a position that "out-flanks" one or more of the
+							opponent's discs.
+						</li>
+						<li>
+							A disc or row of discs is outflanked when it is surrounded at the
+							ends by discs of the opposite color.
+						</li>
+						<li>
+							All the discs which are outflanked will be flipped, even if it is
+							to the player's advantage not to flip them.
+						</li>
+						<li>
+							Discs may only be outflanked as a direct result of a move and must
+							fall in the direct line of the disc being played.
+						</li>
+						<li>
+							If you can't outflank and flip at least one opposing disc, you
+							must pass your turn. However, if a move is available to you, you
+							can't forfeit your turn.
+						</li>
+						<li>
+							Once a disc has been placed on a square, it can never be moved to
+							another square later in the game.
+						</li>
+						<li>
+							When a player runs out of discs, but still has opportunities to
+							outflank an opposing disc, then the opponent must give the player
+							a disc to use.
+						</li>
+					</ul>
+				</div>
 
-                <div id="inst-box-3" class="text-box" >
-                    <h1>End of the Game</h1>
+				<div id="inst-box-3" class="text-box">
+					<h1>End of the Game</h1>
 
-                    <ul>
-                        <li>When it is no longer possible for either player to move, the game is over.</li>
-                        <li>The discs are now counted and the player with the majority of his or her color discs on the board is the winner.</li>
-                        <li>A tie is possible.</li>
-                    </ul>
-                </div>
+					<ul>
+						<li>
+							When it is no longer possible for either player to move, the game
+							is over.
+						</li>
+						<li>
+							The discs are now counted and the player with the majority of his
+							or her color discs on the board is the winner.
+						</li>
+						<li>A tie is possible.</li>
+					</ul>
+				</div>
 
-                <div class="mult-button">
-                    <div class="button" id="inst-prev">
-                        <p>Prev</p>
-                    </div>
-                    <div class="button" id="inst-next">
-                        <p>Next</p>
-                    </div>
-                </div>
+				<div class="mult-button">
+					<div class="button" id="inst-prev">
+						<p>Prev</p>
+					</div>
+					<div class="button" id="inst-next">
+						<p>Next</p>
+					</div>
+				</div>
 
-                <div class="button" id="close-button-inst">
-                    <p>Close</p>
-                </div>
-            </div>     
+				<div class="button" id="close-button-inst">
+					<p>Close</p>
+				</div>
+			</div>
 
+			<!-- High Score -->
+			<div class="panel modal" id="high-score-box">
+				<h1>Scores</h1>
+				<h2 id="won-text">Congratulations! You won!</h2>
+				<h2 id="lost-text">You lost!</h2>
+				<h2 id="tie-text">Tie!</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Nick</th>
+							<th>Victories</th>
+							<th>Games</th>
+						</tr>
+					</thead>
 
-            <!-- High Score -->
-            <div class="panel modal" id="high-score-box" >
-                <h1>Scores</h1>
-                <h2 id="won-text">Congratulations! You won!</h2>
-                <h2 id="lost-text">You lost!</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-    
-                    <tbody id="highscore-content">
-                    </tbody>
-                </table>   
+					<tbody id="highscore-content"></tbody>
+				</table>
 
-                <div class="button" id="close-button-hs">
-                    <p>Close</p>
-                </div>
-            </div>
+				<div class="button" id="close-button-hs">
+					<p>Close</p>
+				</div>
+			</div>
 
-            <!-- Game -->
-            <div id="game-box" class="panel-game">
-                <img id="forfeit-flag" alt="forfeit" class="image-holder bottom-right-button" src="img/white-flag.png" />
-                <img id="skip-icon" alt="skip" class="image-holder bottom-right-button-2" src="img/skip.png" />
-                <img id="manual-icon" alt="manual" class="image-holder top-right-button" src="img/manual.png" />
-                <img id="ranking-icon" alt="ranking" class="image-holder top-left-button" src="img/ranking.png" />
+			<!-- Game -->
+			<div id="game-box" class="panel-game">
+				<img
+					id="forfeit-flag"
+					alt="forfeit"
+					class="image-holder bottom-right-button"
+					src="img/white-flag.png"
+				/>
+				<img
+					id="skip-icon"
+					alt="skip"
+					class="image-holder bottom-right-button-2"
+					src="img/skip.png"
+				/>
+				<img
+					id="manual-icon"
+					alt="manual"
+					class="image-holder top-right-button"
+					src="img/manual.png"
+				/>
+				<img
+					id="ranking-icon"
+					alt="ranking"
+					class="image-holder top-left-button"
+					src="img/ranking.png"
+				/>
 
-                <div id="board"></div>
-                <div class="state">
-                    <p>Dark pieces: <span id="dark-pieces"></span></p>
-                    <p>Light pieces: <span id="light-pieces"></span></p>
-                    <p>Empty cells: <span id="empty-cells"></span></p>
-                </div>
-            
-                <!-- Messages-->
-                <div class="text-box msg-text-box modal" id="msg-box">
-            </div>
-            
-            </div>
-            
-            <!-- Confirmation Dialog -->
-            <div id="confirmation-dialog" class="panel modal">
-                <h1 id="dialog-title">Dialog Title</h1>
+				<div id="board"></div>
+				<div class="state">
+					<p>Dark pieces: <span id="dark-pieces"></span></p>
+					<p>Light pieces: <span id="light-pieces"></span></p>
+					<p>Empty cells: <span id="empty-cells"></span></p>
+				</div>
 
-                <p id="dialog-content">Dialog Content</p>
+				<!-- Messages-->
+				<div class="text-box msg-text-box modal" id="msg-box"></div>
+			</div>
 
-                <div class="mult-button">
-                    <div class="button" id="cancel-button">
-                        <p>Cancel</p>
-                    </div>
+			<!-- Confirmation Dialog -->
+			<div id="confirmation-dialog" class="panel modal">
+				<h1 id="dialog-title">Dialog Title</h1>
 
-                    <div class="button" id="confirm-button">
-                        <p>Confirm</p>
-                    </div>
-                </div>
-            </div>
+				<p id="dialog-content">Dialog Content</p>
 
-            <!-- Wait for opponent-->
-            <div id="wait-opponent" class="panel modal">
-                <h1>Waiting for opponent...</h1>
-            </div>
+				<div class="mult-button">
+					<div class="button" id="cancel-button">
+						<p>Cancel</p>
+					</div>
 
-            <!-- Game Alert-->
-            <div class="panel modal no-background" id="game-alert"></div>
-        </div>
-    </body>
+					<div class="button" id="confirm-button">
+						<p>Confirm</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Wait for opponent-->
+			<div id="wait-opponent" class="panel modal">
+				<h1>Waiting for opponent...</h1>
+			</div>
+
+			<!-- Game Alert-->
+			<div class="panel modal no-background" id="game-alert"></div>
+		</div>
+	</body>
 </html>
