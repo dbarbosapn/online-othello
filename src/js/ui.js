@@ -265,20 +265,15 @@ class UI {
 			board.size * board.size - board.light - board.dark;
 	}
 
-	verifyButtonVisibility() {
-		let forfeit = document.getElementById("forfeit-flag");
+	showSkip() {
 		let skip = document.getElementById("skip-icon");
 
-		// Show pass button and forfeit too
-		forfeit.style.display = "block";
 		skip.style.display = "block";
 	}
 
-	resetButtonVisibility() {
-		let forfeit = document.getElementById("forfeit-flag");
+	hideSkip() {
 		let skip = document.getElementById("skip-icon");
 
-		//forfeit.style.display = "none";
 		skip.style.display = "none";
 	}
 
@@ -326,13 +321,8 @@ class UI {
 
 		forfeit.style.display = "block";
 
-		skip.onclick = () => {
-			forfeit.style.display = "none";
-			skip.style.display = "none";
-			this.currentBoard.currentPlayer =
-				this.configuration.playerColor == 1 ? 2 : 1;
-			this.client.aiTurn();
-		};
+		skip.onclick = () => this.client.skip();
+
 		skip.style.display = "none";
 	}
 
@@ -358,7 +348,7 @@ class UI {
 
 		this.addTextElement(ref, "p", msg, className).scrollIntoView(true);
 	}
-	
+
 	addTextElement(reference, whatType, msg, whatClass = null) {
 		/* Creating a new element of type "whatType", where whatType=="p" || 
             whatType=="h1" etc..*/
@@ -457,15 +447,16 @@ class UI {
 	displayScores(scores) {
 		let content = "";
 
-		scores.forEach((score) =>
-			(content +=
-				"<tr><td>" +
-				score.nick +
-				"</td><td>" +
-				score.victories +
-				"</td><td>" +
-				score.games +
-				"</td></tr>")
+		scores.forEach(
+			(score) =>
+				(content +=
+					"<tr><td>" +
+					score.nick +
+					"</td><td>" +
+					score.victories +
+					"</td><td>" +
+					score.games +
+					"</td></tr>")
 		);
 		document.getElementById("highscore-content").innerHTML = content;
 
@@ -505,7 +496,7 @@ class UI {
 		return type;
 	}
 
-	wonConclusion(){
+	wonConclusion() {
 		document.getElementById("won-text").style.display = "inline";
 	}
 

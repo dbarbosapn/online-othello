@@ -110,9 +110,17 @@ class Client {
 					this.playOnline();
 				}
 
-				this.game.update(data.turn === this.name, data.board);
+				this.game.update(
+					data.turn === this.name,
+					data.board,
+					"skip" in data && data.skip
+				);
 			}
 		};
+	}
+
+	skip() {
+		this.game.skip();
 	}
 
 	leave() {
