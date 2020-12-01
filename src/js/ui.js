@@ -496,15 +496,16 @@ class UI {
 		return type;
 	}
 
-	wonConclusion() {
+
+	wonFinish() {
 		document.getElementById("won-text").style.display = "inline";
 	}
 
-	loseConclusion() {
+	lostFinish() {
 		document.getElementById("lost-text").style.display = "inline";
 	}
 
-	tieConclusion() {
+	tiedFinish() {
 		document.getElementById("tie-text").style.display = "inline";
 	}
 }

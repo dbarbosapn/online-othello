@@ -170,6 +170,12 @@ class Client {
 			});
 	}
 
+	aiRanking() {
+		let scores = JSON.parse(localStorage.getItem("local-scores"));
+		let computerScore = JSON.parse(localStorage.getItem("computer-score"));
+		this.ui.displayScores([computerScore, ...Object.values(scores)]);
+	}
+
 	async notify(move) {
 		return this.sendRequest("notify", {
 			nick: this.name,
