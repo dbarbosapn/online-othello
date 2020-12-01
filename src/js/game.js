@@ -295,16 +295,14 @@ class OnlineGame {
 		console.log("Updating board...");
 
 		this.currentBoard.updateWithMatrix(board);
-		this.currentBoard.currentPlayer = play ? this.playerColor : Board.invertType(this.playerColor);
+		this.currentBoard.currentPlayer = play
+			? this.playerColor
+			: Board.invertType(this.playerColor);
 
-		if (play)
-			this.ui.showGameAlert("Your turn!");
+		if (play) this.ui.showGameAlert("Your turn!");
 
-		if (play && skip)
-			this.ui.showSkip();
-
-		else
-			this.ui.hideSkip();
+		if (play && skip) this.ui.showSkip();
+		else this.ui.hideSkip();
 
 		this.ui.processBoard(this.currentBoard);
 	}
