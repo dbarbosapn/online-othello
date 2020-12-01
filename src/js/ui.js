@@ -265,20 +265,15 @@ class UI {
 			board.size * board.size - board.light - board.dark;
 	}
 
-	verifyButtonVisibility() {
-		let forfeit = document.getElementById("forfeit-flag");
+	showSkip() {
 		let skip = document.getElementById("skip-icon");
 
-		// Show pass button and forfeit too
-		forfeit.style.display = "block";
 		skip.style.display = "block";
 	}
 
-	resetButtonVisibility() {
-		let forfeit = document.getElementById("forfeit-flag");
+	hideSkip() {
 		let skip = document.getElementById("skip-icon");
 
-		//forfeit.style.display = "none";
 		skip.style.display = "none";
 	}
 
@@ -326,13 +321,8 @@ class UI {
 
 		forfeit.style.display = "block";
 
-		skip.onclick = () => {
-			forfeit.style.display = "none";
-			skip.style.display = "none";
-			this.currentBoard.currentPlayer =
-				this.configuration.playerColor == 1 ? 2 : 1;
-			this.client.aiTurn();
-		};
+		skip.onclick = () => this.client.skip();
+
 		skip.style.display = "none";
 	}
 
@@ -505,6 +495,7 @@ class UI {
 		}
 		return type;
 	}
+
 
 	wonFinish() {
 		document.getElementById("won-text").style.display = "inline";
