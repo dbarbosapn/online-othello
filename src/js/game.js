@@ -291,7 +291,7 @@ class OnlineGame {
 		}
 	}
 
-	update(play, board) {
+	update(play, board, skip) {
 		console.log("Updating board...");
 		this.currentBoard.updateWithMatrix(board);
 		this.currentBoard.currentPlayer = play
@@ -300,15 +300,24 @@ class OnlineGame {
 
 		if (play) this.ui.showGameAlert("Your turn!");
 
+		if (skip) this.ui.showSkip();
+		else this.ui.hideSkip();
+
 		this.ui.processBoard(this.currentBoard);
 	}
 
 	playerTurn(point) {
-		this.client
-			.notify({
+		let move = null;
+
+		if (point !== null) {
+			move = {
 				row: point.x,
 				column: point.y,
-			})
+			};
+		}
+
+		this.client
+			.notify(move)
 			.then((res) => {
 				if ("error" in res) {
 					console.log(res.error);
@@ -320,6 +329,10 @@ class OnlineGame {
 				console.log(err);
 				this.ui.outputMessage("error", "An unknown error occurred.");
 			});
+	}
+
+	skip() {
+		this.playerTurn(null);
 	}
 
 	checkPossibleErrors(error) {
@@ -394,6 +407,11 @@ class AiGame {
 		this.checkPlayerStuck();
 	}
 
+	skip() {
+		this.currentBoard.currentPlayer = this.aiColor;
+		this.client.aiTurn();
+	}
+
 	aiTurn() {
 		setTimeout(() => {
 			if (this.checkStuck(this.currentBoard.currentPlayer)) {
@@ -408,7 +426,7 @@ class AiGame {
 			if (newBoard) {
 				this.currentBoard = newBoard;
 				this.ui.processBoard(this.currentBoard);
-				this.ui.resetButtonVisibility();
+				this.ui.hideSkip();
 
 				this.ui.showGameAlert("Your turn!");
 			}
@@ -423,7 +441,7 @@ class AiGame {
 			return false;
 		} else if (this.currentBoard.noMove(type)) {
 			if (this.currentBoard.currentPlayer === this.playerColor)
-				this.ui.verifyButtonVisibility();
+				this.ui.showSkip();
 			else this.ui.showGameAlert("Your turn!");
 			return true;
 		}
