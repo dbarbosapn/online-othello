@@ -332,9 +332,9 @@ class OnlineGame {
 	}
 
 	endGame(winner) {
-		if (winner == null) this.ui.tieConclusion();
-		else if (winner === this.client.name) this.ui.wonConclusion();
-		else this.ui.loseConclusion();
+		if (winner == null) this.ui.tiedFinish();
+		else if (winner === this.client.name) this.ui.wonFinish();
+		else this.ui.lostFinish();
 
 		// Go back to configuration
 		this.ui.showConfiguration();
@@ -448,19 +448,52 @@ class AiGame {
 		let playerScore = this.currentBoard.score(this.playerColor);
 		let aiScore = this.currentBoard.score(this.playerColor == 1 ? 2 : 1);
 
+		// We separate the scores because a player can also login with the name "Computer"
+		let scores = localStorage.getItem("local-scores");
+		if (scores === null) scores = JSON.stringify({});
+		scores = JSON.parse(scores);
+
+		let computerScore = localStorage.getItem("computer-score");
+		if (computerScore === null) {
+			computerScore = JSON.stringify({
+				nick: "Computer",
+				victories: 0,
+				games: 0,
+			});
+		}
+		computerScore = JSON.parse(computerScore);
+		let playerName = this.client.name;
+
+		if (!(playerName in scores)) {
+			scores[playerName] = {
+				nick: playerName,
+				victories: 0,
+				games: 0,
+			};
+		}
+
+		scores[playerName].games++;
+		computerScore.games++;
+
 		if (playerScore > aiScore) {
-			this.ui.wonConclusion();
+			this.ui.wonFinish();
+			scores[playerName].victories++;
 		} else if (playerScore < aiScore) {
-			this.ui.loseConclusion();
+			this.ui.lostFinish();
+			computerScore.victories++;
 		} else {
-			this.ui.tieConclusion();
+			this.ui.tiedFinish();
 		}
 
 		// Go back to configuration
 		this.ui.showConfiguration();
 
+		// Update local scores
+		localStorage.setItem("local-scores", JSON.stringify(scores));
+		localStorage.setItem("computer-score", JSON.stringify(computerScore));
+
 		// Show highscores
-		this.client.ranking();
+		this.client.aiRanking();
 	}
 
 	forfeit() {

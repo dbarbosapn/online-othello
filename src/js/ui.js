@@ -358,7 +358,7 @@ class UI {
 
 		this.addTextElement(ref, "p", msg, className).scrollIntoView(true);
 	}
-	
+
 	addTextElement(reference, whatType, msg, whatClass = null) {
 		/* Creating a new element of type "whatType", where whatType=="p" || 
             whatType=="h1" etc..*/
@@ -457,15 +457,16 @@ class UI {
 	displayScores(scores) {
 		let content = "";
 
-		scores.forEach((score) =>
-			(content +=
-				"<tr><td>" +
-				score.nick +
-				"</td><td>" +
-				score.victories +
-				"</td><td>" +
-				score.games +
-				"</td></tr>")
+		scores.forEach(
+			(score) =>
+				(content +=
+					"<tr><td>" +
+					score.nick +
+					"</td><td>" +
+					score.victories +
+					"</td><td>" +
+					score.games +
+					"</td></tr>")
 		);
 		document.getElementById("highscore-content").innerHTML = content;
 
@@ -505,15 +506,15 @@ class UI {
 		return type;
 	}
 
-	wonConclusion(){
+	wonFinish() {
 		document.getElementById("won-text").style.display = "inline";
 	}
 
-	loseConclusion() {
+	lostFinish() {
 		document.getElementById("lost-text").style.display = "inline";
 	}
 
-	tieConclusion() {
+	tiedFinish() {
 		document.getElementById("tie-text").style.display = "inline";
 	}
 }
