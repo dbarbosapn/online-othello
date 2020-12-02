@@ -309,7 +309,8 @@ class UI {
 		};
 
 		ranking.onclick = () => {
-			this.client.ranking();
+			if (this.client.matchId == null) this.client.aiRanking();
+			else this.client.ranking();
 		};
 
 		forfeit.onclick = () => {
@@ -495,7 +496,6 @@ class UI {
 		}
 		return type;
 	}
-
 
 	wonFinish() {
 		document.getElementById("won-text").style.display = "inline";

@@ -293,6 +293,7 @@ class OnlineGame {
 
 	update(play, board, skip) {
 		console.log("Updating board...");
+
 		this.currentBoard.updateWithMatrix(board);
 		this.currentBoard.currentPlayer = play
 			? this.playerColor
@@ -300,7 +301,7 @@ class OnlineGame {
 
 		if (play) this.ui.showGameAlert("Your turn!");
 
-		if (skip) this.ui.showSkip();
+		if (play && skip) this.ui.showSkip();
 		else this.ui.hideSkip();
 
 		this.ui.processBoard(this.currentBoard);
