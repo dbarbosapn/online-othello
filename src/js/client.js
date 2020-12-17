@@ -6,8 +6,9 @@ class Client {
 		/* Replace with our group number */
 		this.group = group;
 
-		/* Server name */
-		this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+	        /* Server name */
+	        //this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+	        this.serverURL = "http://localhost:6969/";
 
 		/* Match Id */
 		this.matchId = null;
@@ -151,10 +152,10 @@ class Client {
 
 	/*
 	  	This method can be called in different situations, but depending on who calls
-		it we need to close eventSource. 
+		it we need to close eventSource.
 		Example: At the end of a game we call ranking and we need to close
 		event source, since we are going to leave.
-		During the game, we can call the highScore table and 
+		During the game, we can call the highScore table and
 		continue playing, so we DONT want to close the eventSource.
 	 */
 	ranking(leftGame) {
