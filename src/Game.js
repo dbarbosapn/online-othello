@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const Board = require("../Board");
+const Board = require("./Board");
 
 module.exports = class Game {
 	constructor() {
