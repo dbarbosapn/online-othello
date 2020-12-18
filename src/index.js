@@ -1,200 +1,209 @@
-class Server {
+const http = require("http");
+const url = require("url");
+const fs = require("fs");
+const config = require("./config");
+const accounts = require("./accounts");
+const ranking = require("./ranking");
+const controller = require("./gamecontroller");
+const { parse } = require("path");
 
-    // Atenção não estamos a usar websockets, mas SSE(Server sent events), simplemente
-    // porque ja temos o nosso cliente a funcionar com SSE. Supostamente com jogos
-    // é suposto usar webSocket, mas como ate os professores implementaram o server
-    // com SSE acho que não ha problema de fazermos o mesmo
-    constructor() {
-	this.http = require('http');
-	this.url = require('url');
-	this.fs = require('fs');
+http
+	.createServer((request, response) => {
+		switch (request.method) {
+			case "GET":
+				doGetRequest(request, response);
+				break;
 
-	this.conf = require('./conf.js');
+			case "POST":
+				doPostRequest(request, response);
+				break;
 
-	this.server = this.newServer();
-    }
-
-    newServer() {
-	// Creates http server
-    	this.server = this.http.createServer((request, response) => {
-    	    switch(request.method) {
-    	    case "GET":
-    		this.getRequest(request, response);
-    		break;
-
-	    case "POST":
-		this.postRequest(request, response);
-		break;
-
-    	    default:
-    		response.writeHead(501); // Not Implemented
-    		response.end();
-    		break;
-    	    }
-    	}).listen(this.conf.port);
-    }
-
-    postRequest(request, response) {
-	let body = "";
-	let query; // http://Host:PORT/Pathname?Query
-
-	request
-	    // More data coming
-	    .on('data', (chunk) => { body += chunk; })
-	    // No more pending data
-	    .on('end', () => {
-		try {
-		    query = JSON.parse(body);
-		    this.checkCommand(request, response, query);
+			default:
+				response.writeHead(501); // Not Implemented
+				response.end();
+				break;
 		}
-		catch(err) { console.log(err); }
-	    })
-	    .on('error', (err) => { console.log(err); });
-    }
+	})
+	.listen(config.port);
+console.log(`Server listening on port ${config.port}`);
 
-    checkCommand(request, response, query) {
-	switch( this.url.parse(request.url, false).pathname ) {
-	case '/register':
-	    this.doRegistration(query, response);
-	    break;
+function doGetRequest(request, response) {
+	const parsedURL = url.parse(request.url, true);
 
-	case '/ranking':
-	    this.doRanking(response);
-	    break;
-
-	case '/join':
-	    this.doJoin(response, query);
-	    break;
-
-	default:
-	    response.writeHead(501);
-	    response.end();
-	    break;
+	switch (parsedURL.pathname) {
+		case "/update":
+			setupUpdate(parsedURL.query, response);
+			break;
+		// Static content like index.html css js images etc..
+		default:
+			getStaticContent(request, response);
+			break;
 	}
-    }
-
-    doRegistration(query, response) {
-	// change to an actual registration
-	response.writeHead(200);
-	response.end(JSON.stringify({name:"registtration"}));
-    }
-
-    doRanking(response) {
-	// Change to an actual response
-	response.writeHead(200);
-	response.end(JSON.stringify({name:"ranking"}));
-    }
-
-    doJoin(response, query) {
-	// Change to an actual join
-	response.writeHead(200);
-	response.end(JSON.stringify({name:"join"}));
-    }
-
-    getRequest(request, response) {
-	const parsedUrl = this.url.parse(request.url, false);
-
-	switch( parsedUrl.pathname ) {
-	case "/update":
-	    this.doUpdate(parsedUrl.query, response);
-	    break;
-
-	// Static content like index.html css js images etc..
-	default:
-	    this.getStaticContent(request, response);
-	    break;
-	}
-    }
-
-    doUpdate(query, response) {
-	const headers = {
-	    'Content-Type': 'text/event-stream',
-	    'Connection': 'keep-alive',
-	    'Cache-Control': 'no-cache'
-	};
-
-	response.writeHead(200, headers);
-
-	this.writeToClient(response, {name:"update"});
-    }
-
-    // Writes to client event stream. Seems to have some kind of problem
-    writeToClient(response, data) {
-	setInterval(() => { response.write("Hello"); }, 2000);
-    }
-
-    getStaticContent(request, response) {
-    	const pathname = this.getPathname(request);
-
-    	if ( pathname === null ) {
-    	    response.writeHead(403); //Forbidden
-    	    response.end();
-    	}
-
-    	else {
-    	    this.fs.stat(pathname, (err, stats) => {
-    		if ( err ) {
-    		    response.writeHead(500); // Internal Server error
-    		    console.log(err);
-    		    response.end();
-    		}
-
-    		else if ( stats.isDirectory() ) {
-
-    		    if ( pathname.endsWith('/') ) {
-    			this.getResource(pathname + this.conf.defaultIndex, response);
-    		    }
-
-    		    else {
-    			resonse.writeHead(301, {"Location": pathname + '/'});
-    			response.end();
-    		    }
-    		}
-
-    		else {
-    		    this.getResource(pathname, response);
-    		}
-    	    });
-    	}
-    }
-
-    getPathname(request) {
-    	const parsedUrl = this.url.parse(request.url);
-
-    	let pathname = this.conf.documentRoot + parsedUrl.pathname;
-
-    	return pathname.startsWith(this.conf.documentRoot) ? pathname : null;
-    }
-
-    getMediaType(pathname) {
-	const pos = pathname.lastIndexOf('.');
-	let mediaType;
-
-	if ( pos != -1 )
-	    mediaType = this.conf.mediaTypes[pathname.substring(pos+1)];
-
-	if ( mediaType == undefined )
-	    mediaType = 'test/plain';
-
-	return mediaType;
-    }
-
-    getResource(pathname, response) {
-	const mediaType = this.getMediaType(pathname);
-	const encoding = mediaType.startsWith("image") ? null: "utf8";
-
-    	this.fs.readFile(pathname, encoding, (err, data) => {
-    	    if ( err ) {
-    		response.writeHead(404); // Not found
-    		response.end();
-    	    }
-
-    	    else {
-    		response.writeHead(200, { 'Content-Type': mediaType });
-    		response.end(data);
-    	    }
-    	});
-    }
 }
 
-var server = new Server();
+function doPostRequest(request, response) {
+	const parsedURL = url.parse(request.url, false);
+
+	let rawBody = "";
+	let body;
+
+	request
+		.on("data", (chunk) => {
+			rawBody += chunk;
+		})
+		.on("end", () => {
+			try {
+				body = JSON.parse(rawBody);
+
+				parseCommand(parsedURL.pathname, body, response);
+			} catch (err) {
+				console.log(err);
+				response.writeHead(500);
+				response.end();
+			}
+		})
+		.on("error", (err) => {
+			console.log(err);
+			response.writeHead(500);
+			response.end();
+		});
+}
+
+function parseCommand(pathname, body, response) {
+	switch (pathname) {
+		case "/register":
+			doRegister(body, response);
+			break;
+		case "/join":
+			doJoin(body, response);
+			break;
+		case "/ranking":
+			doRanking(response);
+			break;
+		default:
+			response.writeHead(404); // Not Found
+			response.end();
+			break;
+	}
+}
+
+function doRegister(body, response) {
+	if (!body.nick || !body.pass) {
+		response.writeHead(400);
+		response.end(JSON.stringify({ error: "Invalid request body." }));
+		return;
+	}
+
+	if (accounts.authenticate(body.nick, body.pass, true)) {
+		response.writeHead(200);
+		response.end("{}");
+	} else {
+		response.writeHead(401);
+		response.end(
+			JSON.stringify({ error: "User registered with a different password" })
+		);
+	}
+}
+
+function doRanking(response) {
+	response.writeHead(200);
+	response.end(JSON.stringify({ ranking: ranking.getRanking() }));
+}
+
+function doJoin(body, response) {
+	if (!body.nick || !body.pass) {
+		response.writeHead(400);
+		response.end(JSON.stringify({ error: "Invalid request body." }));
+		return;
+	}
+
+	if (!accounts.authenticate(body.nick, body.pass)) {
+		response.writeHead(401);
+		response.end(
+			JSON.stringify({ error: "User registered with a different password" })
+		);
+		return;
+	}
+
+	let res = controller.joinGame(body.nick);
+
+	response.writeHead(200);
+	response.end(JSON.stringify(res));
+}
+
+function setupUpdate(query, response) {
+	if (!query.nick || !query.game) {
+		response.writeHead(400);
+		response.end(JSON.stringify({ error: "Invalid request query." }));
+		return;
+	}
+
+	controller.setupUpdate(query.nick, query.game, response);
+}
+
+function getStaticContent(request, response) {
+	const pathname = getPathname(request);
+
+	if (pathname === null) {
+		response.writeHead(403); //Forbidden
+		response.end();
+	} else {
+		fs.stat(pathname, (err, stats) => {
+			if (err) {
+				switch (err.errno) {
+					case -2:
+						response.writeHead(404); // Page not found
+						break;
+					default:
+						response.writeHead(500); // Internal Server error
+						break;
+				}
+				console.log(err);
+				response.end();
+			} else if (stats.isDirectory()) {
+				if (pathname.endsWith("/")) {
+					getResource(pathname + config.defaultIndex, response);
+				} else {
+					response.writeHead(301, { Location: pathname + "/" });
+					response.end();
+				}
+			} else {
+				getResource(pathname, response);
+			}
+		});
+	}
+}
+
+function getPathname(request) {
+	const parsedURL = url.parse(request.url);
+
+	let pathname = config.documentRoot + parsedURL.pathname;
+
+	return pathname.startsWith(config.documentRoot) ? pathname : null;
+}
+
+function getMediaType(pathname) {
+	const pos = pathname.lastIndexOf(".");
+	let mediaType;
+
+	if (pos != -1) mediaType = config.mediaTypes[pathname.substring(pos + 1)];
+
+	if (mediaType == undefined) mediaType = "test/plain";
+
+	return mediaType;
+}
+
+function getResource(pathname, response) {
+	const mediaType = getMediaType(pathname);
+	const encoding = mediaType.startsWith("image") ? null : "utf8";
+
+	fs.readFile(pathname, encoding, (err, data) => {
+		if (err) {
+			response.writeHead(404); // Not found
+			response.end();
+		} else {
+			response.writeHead(200, { "Content-Type": mediaType });
+			response.end(data);
+		}
+	});
+}
