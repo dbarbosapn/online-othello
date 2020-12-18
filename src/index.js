@@ -1,39 +1,38 @@
 const http = require("http");
 const url = require("url");
 const fs = require("fs");
-const config = require("./config");
+const config = require("./config"); 
 const accounts = require("./accounts");
-const ranking = require("./ranking");
+const ranking = require("./ranking");/*
 const controller = require("./gamecontroller");
-const { parse } = require("path");
+const { parse } = require("path"); */
 
-http
-	.createServer((request, response) => {
-		switch (request.method) {
-			case "GET":
-				doGetRequest(request, response);
-				break;
+http.createServer((request, response) => {
+	switch (request.method) {
+		case "GET":
+			doGetRequest(request, response);
+			break;
 
-			case "POST":
-				doPostRequest(request, response);
-				break;
+		case "POST":
+			doPostRequest(request, response);
+			break;
 
-			default:
-				response.writeHead(501); // Not Implemented
-				response.end();
-				break;
-		}
-	})
-	.listen(config.port);
+		default:
+			response.writeHead(501); // Not Implemented
+			response.end();
+			break;
+	}
+}).listen(config.port);
+
 console.log(`Server listening on port ${config.port}`);
 
 function doGetRequest(request, response) {
 	const parsedURL = url.parse(request.url, true);
 
 	switch (parsedURL.pathname) {
-		case "/update":
+/* 		case "/update":
 			setupUpdate(parsedURL.query, response);
-			break;
+			break; */
 		// Static content like index.html css js images etc..
 		default:
 			getStaticContent(request, response);
@@ -73,13 +72,13 @@ function parseCommand(pathname, body, response) {
 	switch (pathname) {
 		case "/register":
 			doRegister(body, response);
-			break;
+			break;/* 
 		case "/join":
 			doJoin(body, response);
-			break;
+			break;*/
 		case "/ranking":
 			doRanking(response);
-			break;
+			break; 
 		default:
 			response.writeHead(404); // Not Found
 			response.end();
@@ -99,17 +98,18 @@ function doRegister(body, response) {
 		response.end("{}");
 	} else {
 		response.writeHead(401);
-		response.end(
-			JSON.stringify({ error: "User registered with a different password" })
+		response.end(JSON.stringify({ error: "User registered with a different password" })
 		);
 	}
 }
 
 function doRanking(response) {
 	response.writeHead(200);
-	response.end(JSON.stringify({ ranking: ranking.getRanking() }));
-}
+	response.end(JSON.stringify({ranking: ranking.getRanking() }));
 
+	ranking.saveRanking("abc", true);
+}
+/*
 function doJoin(body, response) {
 	if (!body.nick || !body.pass) {
 		response.writeHead(400);
@@ -140,7 +140,7 @@ function setupUpdate(query, response) {
 
 	controller.setupUpdate(query.nick, query.game, response);
 }
-
+ */
 function getStaticContent(request, response) {
 	const pathname = getPathname(request);
 
@@ -186,9 +186,11 @@ function getMediaType(pathname) {
 	const pos = pathname.lastIndexOf(".");
 	let mediaType;
 
-	if (pos != -1) mediaType = config.mediaTypes[pathname.substring(pos + 1)];
+	if (pos != -1) 
+		mediaType = config.mediaTypes[pathname.substring(pos + 1)];
 
-	if (mediaType == undefined) mediaType = "test/plain";
+	if (mediaType == undefined) 
+		mediaType = "test/plain";
 
 	return mediaType;
 }

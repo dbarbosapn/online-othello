@@ -11,5 +11,5 @@ module.exports = {
 	},
 	defaultIndex: "index.html",
 	documentRoot: "public",
-	database: "db.json",
+	database: {"users":"dbUsers.json", "ranking":"dbRanking.json"},
 };
