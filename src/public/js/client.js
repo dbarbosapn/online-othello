@@ -6,9 +6,9 @@ class Client {
 		/* Replace with our group number */
 		this.group = group;
 
-	        /* Server name */
-	        //this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
-	        this.serverURL = "http://localhost:6969/";
+		/* Server name */
+		//this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+		this.serverURL = "http://localhost:8035/";
 
 		/* Match Id */
 		this.matchId = null;
