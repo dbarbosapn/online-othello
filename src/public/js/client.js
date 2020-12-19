@@ -23,6 +23,8 @@ class Client {
 		this.game = null;
 
 		this.ui = new UI(this);
+
+		this.leave = this.leave.bind(this);
 	}
 
 	authenticate(username, password) {
