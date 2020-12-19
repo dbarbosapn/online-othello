@@ -271,23 +271,24 @@
 		}
 	};
 	
+
 class Point {
 	constructor(x = 0, y = 0) {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	/* Add point and return a new added point */
 	addPoint(point) {
 		return new Point(this.x + point.x, this.y + point.y);
 	}
-	
+
+
 	toString() {
 		return "(" + this.x + "," + this.y + ")";
 	}
-	
+
 	toArrayIndex(size) {
 		return this.y * size + this.x;
 	}
 }
-	
