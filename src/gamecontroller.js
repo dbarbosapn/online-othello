@@ -1,5 +1,7 @@
 const Player = require("./Player");
 const Game = require("./Game");
+const db = require("./dbcontroller");
+const crypto = require("crypto");
 
 var waitingPlayer = null;
 var timeout = null;
@@ -7,23 +9,16 @@ var timeout = null;
 var players = {};
 
 function joinGame(nick) {
-	if (!players[nick]) players[nick] = new Player(nick);
+	if (!players[nick]) 
+		players[nick] = new Player(nick, db.read("users", nick));
 
 	if (!waitingPlayer) {
-		let game = new Game();
-
+		players[nick].joinGame(new Game(), true);
 		waitingPlayer = players[nick];
+	} 
 
-		stopTimeout();
-		timeout = setTimeout(() => {
-			waitingPlayer.forfeit();
-			waitingPlayer = null;
-		}, 2 * 60 * 1000); // 2 minutes timeout
-
-		waitingPlayer.joinGame(game);
-	} else if (!players[nick].inGame()) {
-		players[nick].joinGame(waitingPlayer.game);
-		stopTimeout();
+	else {
+		players[nick].joinGame(waitingPlayer.game, false);
 		waitingPlayer = null;
 	}
 
@@ -33,13 +28,112 @@ function joinGame(nick) {
 	};
 }
 
-function leaveGame(nick) {
-	players[nick].forfeit();
+function play(data, response) {
+	response.writeHead(200);
 
-	if (nick === waitingPlayer.nick) {
+	if ( 
+		checkValidUser(data.nick, data.pass, response) && 
+		checkValidGame(data.nick, data.game, response) && 
+		checkValidMove(data.nick, data.move, response) ) {
+			response.end(JSON.stringify({}));
+			players[data.nick].game.playPiece(data.move.row, data.move.column, data.nick);
+			// Atention the clock dosent start for player[data.nick], it start for however is suposed to
+			// play, in this case data.nick opponent
+			players[data.nick].game.startClock();
+		}
+
+	else {
+		response.end();
+	}
+}
+
+function checkValidUser(nick, pass, response) {
+	if ( !nick || !pass ) {
+		response.write(JSON.stringify({ error: "Invalid request body." }));
+		return false;
+	}
+	
+	else if ( !players[nick] ) {
+		response.write(JSON.stringify({ error: "Invalid request body." }));
+		return false;
+	}
+
+	else {
+		hashPass = crypto.createHash("md5").update(pass).digest("hex");
+
+		if ( hashPass != players[nick].pass ) {
+			response.write(JSON.stringify({ error: "User registered with a different password" }));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function checkValidGame(nick, gameHash, response) {
+	if ( !players[nick].game || players[nick].game.hash != gameHash ) {
+		response.write(JSON.stringify({error: "Game not found"}));
+		return false;
+	}
+
+	return true;
+}
+
+function checkValidMove(nick, move, response) {
+	let p = players[nick];
+
+	if ( move === undefined ) {
+		response.write(JSON.stringify({ error:"Invalid request body."}));
+		return false;
+	}
+
+	if ( move === null && p.noMoves() ) { 
+		response.write(JSON.stringify({}) );
+		this.p.game.skip();
+		return false;
+	}
+
+	else if ( move.row == undefined ) {
+		response.write(JSON.stringify({ error: "move lacks property row" }));
+		return false;
+	}
+
+	else if ( move.column == undefined ) {
+		response.write(JSON.stringify({ error: "move lacks property column"}));
+		return false;
+	}
+
+	else if ( move.row > 7 || move.row < 0 ) {
+		response.write(JSON.stringify({ error:"row should be an integer between 0 and 7"}));
+		return false;
+	}
+
+	else if ( move.column > 7 || move.column < 0 ) {
+		response.write(JSON.stringify({ error:"column should be an integer between 0 and 7"}));
+		return false;
+	}
+
+	else if ( !p.game.isCurrentPlayer(nick) ) {
+		response.write(JSON.stringify({ error: "Not your turn to play"}));
+		return false;
+	}
+
+	else if ( !p.game.validPossition(move.row, move.column, nick) ) {
+		response.write(JSON.stringify({ error: "Invalid move"}));
+		return false;
+	}
+
+	return true;
+}
+
+function leaveGame(nick) {
+	if ( players[nick] && waitingPlayer && players[nick] == waitingPlayer.nick ) {
 		waitingPlayer = null;
 		stopTimeout();
 	}
+
+	else if ( players[nick] )
+		players[nick].forfeit();
 }
 
 function stopTimeout() {
@@ -73,8 +167,6 @@ function setupUpdate(nick, hash, response) {
 		players[nick].setUpdateResponse(response);
 		players[nick].sendResponseData("{}");
 	}
-
-	return true;
 }
 
-module.exports = { joinGame, leaveGame, setupUpdate };
+module.exports = { joinGame, leaveGame, setupUpdate, play };

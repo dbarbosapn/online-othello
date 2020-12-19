@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 const Board = require("./Board");
+const dbcontroller = require("./dbcontroller");
+const rank = require("./ranking");
 
 module.exports = class Game {
 	constructor() {
@@ -7,56 +9,117 @@ module.exports = class Game {
 		this.hash = crypto.createHash("md5").update(d.toString()).digest("hex");
 		this.players = [];
 		this.board = new Board();
+
+		this.turn = 0;
 	}
 
 	addPlayer(player) {
-		if (this.playerCount() >= 2) return null;
-
 		this.players.push(player);
-
-		this.broadcastStatus();
-
-		if (this.playerCount() == 0) return "dark";
-		else return "light";
+		
+		if ( this.players.length == 2 ) {
+			this.broadcastStatus();
+			this.startClock();
+		}
 	}
 
 	playerCount() {
 		return this.players.length;
 	}
 
-	finishGame(winningColor) {
-		// finish game
+	getPlayerColor(nick) {
+		return this.players[0].nick == nick ? 1: 2
+	}
+
+	validPossition(row, col, nick) {
+		return this.board.validPositionWithRowCol(row, col, this.getPlayerColor(nick));
 	}
 
 	getCurrentPlayer() {
 		return this.players[this.board.currentPlayer - 1];
 	}
 
+	isCurrentPlayer(nick) {
+		return this.getCurrentPlayer().nick == nick;
+	}
+
+	playPiece(row, column, nick) {
+		this.board = this.board.newPieceWithRowColumn(this.getPlayerColor(nick), row, column);
+
+		if ( !this.board )
+			console.log("Falhou ao ver se a jogada era valida e tentou se jogala");
+
+		this.broadcastStatus();
+	}
+
+	noMoves() {
+		return this.board.noMove(this.getCurrentPlayer());
+	}
+
+	skip() {
+		this.board.changeOnSkip();
+		this.broadcastStatus();
+	}
+
+	startClock() {
+		this.turn++;
+		let newTurn = this.turn;
+
+		setTimeout(() => {
+			if ( newTurn == this.turn ) {
+				this.getCurrentPlayer().forfeit();
+			}
+		}, 120000);
+	}
+
+	finishGame(wc) {
+		this.broadcastStatus(wc == "dark" ? this.players[0].nick : this.players[1].nick);
+	}
 	/**
 	 * This function will also automatically start the game, when both players join.
 	 */
-	broadcastStatus() {
+	broadcastStatus(wc = null) {
 		this.players.forEach((player) => {
-			player.sendResponseData(JSON.stringify(this.getGameStatus()));
+			player.sendResponseData(JSON.stringify(this.getGameStatus(wc, player)));
 		});
 	}
 
-	/**
-	 * TODO: This function should receive a player as argument and send skip, if he can skip etc.
-	 */
-	getGameStatus() {
-		if (this.playerCount() !== 2) return {};
-		return {
-			board: this.board.getMatrix(),
-			turn: this.getCurrentPlayer().nick,
-			count: {
-				dark: this.board.dark,
-				light: this.board.light,
-				empty:
-					this.board.size * this.board.size -
-					this.board.dark -
-					this.board.light,
-			},
-		};
+	getGameStatus(win = null, player = null) {
+		if (this.playerCount() !== 2) 
+			return {};
+
+		else if ( this.board.gameEnd() ) {
+			let win = this.board.dark > this.board.ligth ? this.players[0].nick : (this.board.dark < this.board.ligth ? this.players[1].nick: null);
+			this.hash = null;
+			rank.saveRanking(player.nick, win == player.nick ? 1: 0);
+			return {winner: win}
+		}
+
+		else if ( win ) {
+			this.hash = null;
+			rank.saveRanking(player.nick, win == player.nick ? 1: 0);
+			return {winner: win};
+		}
+
+		else {
+			let body = {
+					board: this.board.getMatrix(),
+					turn: this.getCurrentPlayer().nick,
+					count: {
+						dark: this.board.dark,
+						light: this.board.light,
+						empty:
+							this.board.size * this.board.size -
+							this.board.dark -
+							this.board.light,
+					},
+				};
+
+			if ( !this.board.getPossibleMoves(this.getCurrentPlayer()) ) {
+				body.skip = true;
+			}
+
+			return body;
+
+		}
 	}
 };

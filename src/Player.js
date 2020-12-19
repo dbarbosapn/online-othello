@@ -1,6 +1,7 @@
 module.exports = class Player {
-	constructor(nick) {
+	constructor(nick, pass) {
 		this.nick = nick;
+		this.pass = pass;
 		this.game = null;
 		this._updateResponse = null;
 		this.color = null;
@@ -10,13 +11,10 @@ module.exports = class Player {
 		return this.game !== null;
 	}
 
-	joinGame(game) {
-		if (this.inGame()) {
-			this.game.finishGame(this._oppositeColor());
-		}
-
+	joinGame(game, first) {
 		this.game = game;
-		this.color = game.addPlayer(this);
+		this.color = first ? "dark": "ligth";
+		game.addPlayer(this);
 	}
 
 	forfeit() {

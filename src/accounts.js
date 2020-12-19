@@ -2,19 +2,21 @@ const db = require("./dbcontroller");
 const crypto = require("crypto");
 
 function authenticate(username, password, create = false) {
-	let users = db.read("users");
-	if (!users) users = {};
+	let dbPass = db.read("users", username);
+	let hashPass = crypto.createHash("md5").update(password).digest("hex");
 
-	let hash = crypto.createHash("md5").update(password).digest("hex");
-
-	if (create && !users[username]) {
-		users[username] = hash;
-		db.save("users", users);
+	if ( !dbPass && create ) {
+		db.save("users", username, hashPass);
+		return true;
 	}
 
-	if (users[username] !== hash) return false;
+	else if ( !dbPass ) {
+		return false;
+	}
 
-	return true;
+	else 
+		return dbPass === hashPass ? true: false;
+
 }
 
 module.exports = { authenticate };
