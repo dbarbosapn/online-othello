@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const { invertType } = require("./Board");
 const Board = require("./Board");
 
 module.exports = class Game {
