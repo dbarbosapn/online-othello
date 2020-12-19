@@ -37,6 +37,9 @@ function play(data, response) {
 		checkValidMove(data.nick, data.move, response) ) {
 			response.end(JSON.stringify({}));
 			players[data.nick].game.playPiece(data.move.row, data.move.column, data.nick);
+			// Atention the clock dosent start for player[data.nick], it start for however is suposed to
+			// play, in this case data.nick opponent
+			players[data.nick].game.startClock();
 		}
 
 	else {
@@ -124,7 +127,6 @@ function checkValidMove(nick, move, response) {
 }
 
 function leaveGame(nick) {
-	console.log("Leave " + nick);
 	if ( players[nick] && waitingPlayer && players[nick] == waitingPlayer.nick ) {
 		waitingPlayer = null;
 		stopTimeout();

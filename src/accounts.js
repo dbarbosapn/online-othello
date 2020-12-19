@@ -5,8 +5,6 @@ function authenticate(username, password, create = false) {
 	let dbPass = db.read("users", username);
 	let hashPass = crypto.createHash("md5").update(password).digest("hex");
 
-	console.log(hashPass);
-
 	if ( !dbPass && create ) {
 		db.save("users", username, hashPass);
 		return true;

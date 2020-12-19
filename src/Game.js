@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 const Board = require("./Board");
+const dbcontroller = require("./dbcontroller");
+const rank = require("./ranking");
 
 module.exports = class Game {
 	constructor() {
@@ -7,13 +9,17 @@ module.exports = class Game {
 		this.hash = crypto.createHash("md5").update(d.toString()).digest("hex");
 		this.players = [];
 		this.board = new Board();
+
+		this.turn = 0;
 	}
 
 	addPlayer(player) {
 		this.players.push(player);
 		
-		if ( this.players.length == 2 )
+		if ( this.players.length == 2 ) {
 			this.broadcastStatus();
+			this.startClock();
+		}
 	}
 
 	playerCount() {
@@ -37,13 +43,10 @@ module.exports = class Game {
 	}
 
 	playPiece(row, column, nick) {
-		console.log("ASSSSSSSSSSSSSSSSSSSSSSS");
 		this.board = this.board.newPieceWithRowColumn(this.getPlayerColor(nick), row, column);
 
 		if ( !this.board )
 			console.log("Falhou ao ver se a jogada era valida e tentou se jogala");
-
-		console.log(this.board.toString());
 
 		this.broadcastStatus();
 	}
@@ -57,6 +60,17 @@ module.exports = class Game {
 		this.broadcastStatus();
 	}
 
+	startClock() {
+		this.turn++;
+		let newTurn = this.turn;
+
+		setTimeout(() => {
+			if ( newTurn == this.turn ) {
+				this.getCurrentPlayer().forfeit();
+			}
+		}, 120000);
+	}
+
 	finishGame(wc) {
 		this.broadcastStatus(wc == "dark" ? this.players[0].nick : this.players[1].nick);
 	}
@@ -64,25 +78,25 @@ module.exports = class Game {
 	 * This function will also automatically start the game, when both players join.
 	 */
 	broadcastStatus(wc = null) {
-		console.log(wc);
 		this.players.forEach((player) => {
-			player.sendResponseData(JSON.stringify(this.getGameStatus(wc)));
+			player.sendResponseData(JSON.stringify(this.getGameStatus(wc, player)));
 		});
 	}
 
-	getGameStatus(win = null) {
-		console.log(win);
+	getGameStatus(win = null, player = null) {
 		if (this.playerCount() !== 2) 
 			return {};
 
 		else if ( this.board.gameEnd() ) {
 			let win = this.board.dark > this.board.ligth ? this.players[0].nick : (this.board.dark < this.board.ligth ? this.players[1].nick: null);
 			this.hash = null;
+			rank.saveRanking(player.nick, win == player.nick ? 1: 0);
 			return {winner: win}
 		}
 
 		else if ( win ) {
 			this.hash = null;
+			rank.saveRanking(player.nick, win == player.nick ? 1: 0);
 			return {winner: win};
 		}
 
