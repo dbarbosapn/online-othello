@@ -56,6 +56,19 @@ module.exports = class Board {
 		let middle = this.size / 2;
 		let point = new Point(middle - 1, middle - 1);
 
+
+		// Test Skip. Leave this here but comment it. Skips are so fk hard to test
+	 	/* for ( let i = 0; i<=7; i++ ) {
+			for( let j = 0; j<=7; j++ ) {
+				if ( !(i==0 && j==0) && !(i==0 && j==7) )
+					this.addPiece(2, new Point(i, j));
+			}
+		}
+		 
+		this.addPiece(1, new Point(0,0));
+
+		console.log(".........>" + this.dark + " " + this.light + "\n" + this.toString()); */
+		
 		this.addPiece(1, point);
 		this.addPiece(1, point.addPoint(new Point(1, 1)));
 		this.addPiece(2, point.addPoint(new Point(0, 1)));
@@ -102,7 +115,7 @@ module.exports = class Board {
 	}
 
 	changeOnSkip() {
-		this.currentPlayer = this.invertType(this.currentPlayer);
+		this.currentPlayer = Board.invertType(this.currentPlayer);
 	}
 
 	/* Get the type of the piece in position "point". Be careful with going out of bounds

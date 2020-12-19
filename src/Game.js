@@ -12,8 +12,11 @@ module.exports = class Game {
 		this.timeout = null;
 	}
 
+	// Ads a player to the game
 	addPlayer(player) {
 		this.players.push(player);
+
+		console.log("Number of players " + this.players.length);
 
 		if (this.players.length == 2) {
 			this.broadcastStatus();
@@ -21,14 +24,7 @@ module.exports = class Game {
 		}
 	}
 
-	playerCount() {
-		return this.players.length;
-	}
-
-	getPlayerColor(nick) {
-		return this.players[0].nick == nick ? 1 : 2;
-	}
-
+	// Return true if (row, col) are a valid possition
 	validPosition(row, col, nick) {
 		return this.board.validPositionWithRowCol(
 			row,
@@ -37,31 +33,69 @@ module.exports = class Game {
 		);
 	}
 
+	// Return the number of player present in the game
+	playerCount() {
+		return this.players.length;
+	}
+
+	// Return the collor associated with nick(username)
+	getPlayerColor(nick) {
+		return this.players[0].nick == nick ? 1 : 2;
+	}
+
+	// Return the object for the current player
 	getCurrentPlayer() {
 		return this.players[this.board.currentPlayer - 1];
 	}
 
+	getWinner() {
+		let dark = this.board.dark;
+		let ligth = this.board.light;
+
+		console.log(dark +" "+ligth);
+
+		return dark > ligth ? this.players[0].nick : (ligth > dark ? this.players[1].nick : "tie");
+	}
+
+	// Return true if nick is the current player
 	isCurrentPlayer(nick) {
 		return this.getCurrentPlayer().nick == nick;
 	}
 
+	// Returns the "pointer" for all of the players present in the game
+	getPlayers() {
+		return this.players;
+	}
+
+	// This function will play a piece given by 2 coordinates. 
+	// It does not check if its possible to actually play it
 	playPiece(row, column, nick) {
 		this.board = this.board.newPieceWithRowColumn(
 			this.getPlayerColor(nick),
 			row,
 			column
 		);
+		
+		// Starts the clock for the next player
 		this._startClock();
 
-		if (!this.board) console.error("Failed to check if the play was valid.");
+		if (!this.board) 
+			console.error("Failed to check if the play was valid.");
 
-		this.broadcastStatus();
+		this.broadcastStatus();			
 	}
 
+	gameIsFinished() {
+		return this.board.gameEnd();
+	}
+
+	// Return a true if the current player has no moves
 	noMoves() {
 		return this.board.noMove(this.board.currentPlayer);
 	}
 
+	// Do skip, but it does not check if it actually can. That is the work
+	// to be done in gameController
 	skip() {
 		this.board.changeOnSkip();
 		this.broadcastStatus();
@@ -71,41 +105,38 @@ module.exports = class Game {
 		if (this.timeout !== null) clearTimeout(this.timeout);
 		this.timeout = setTimeout(() => {
 			this.getCurrentPlayer().forfeit();
-		}, 2 * 60 * 1000);
+		}, 60 * 2 * 1000);
 	}
 
-	finishGame(wc) {
-		this.broadcastStatus(
-			wc == "dark" ? this.players[0].nick : this.players[1].nick
-		);
+	// Argument is the player that want to forfeit!
+	forfeit(player) {
+		this.broadcastStatus(player == this.players[0] ? this.players[1].nick: this.players[0].nick);
 	}
 
-	/**
-	 * This function will also automatically start the game, when both players join.
-	 */
-	broadcastStatus(wc = null) {
+
+	// Function will broadCast the game status for all current players
+	broadcastStatus(won = null) {
 		this.players.forEach((player) => {
-			player.sendResponseData(JSON.stringify(this.getGameStatus(wc, player)));
+			player.sendResponseData(JSON.stringify(this.getGameStatus(player, won)));
 		});
 	}
 
-	getGameStatus(win = null, player = null) {
-		if (this.playerCount() !== 2) return {};
-		else if (this.board.gameEnd() && player) {
-			let win =
-				this.board.dark > this.board.light
-					? this.players[0].nick
-					: this.board.dark < this.board.light
-					? this.players[1].nick
-					: null;
-			this.hash = null;
-			ranking.saveRanking(player.nick, win == player.nick ? 1 : 0);
-			return { winner: win };
-		} else if (win && player) {
-			this.hash = null;
-			ranking.saveRanking(player.nick, win == player.nick ? 1 : 0);
-			return { winner: win };
-		} else {
+	// Function generates a js object with the body of the message that will be sent
+	// and RETURNS it.
+	getGameStatus(player, won = null) {
+		// Game hasn't started
+		if ( this.playerCount() !== 2 ) 
+			return {};
+
+		// Game has a winner
+		else if ( won != null ) {
+			ranking.saveRanking(player.nick, player.nick == won.nick ? 1: 0);
+			console.log(player.nick + " passou");
+			return { winner: won };
+		}
+
+		// Game was changed
+		else {
 			let body = {
 				board: this.board.getMatrix(),
 				turn: this.getCurrentPlayer().nick,
@@ -119,14 +150,11 @@ module.exports = class Game {
 				},
 			};
 
-			if (
-				player &&
-				player.nick === this.getCurrentPlayer().nick &&
-				this.noMoves()
-			) {
+			// If skip is possible i.e no possible moves from current player
+			if ( player && player.nick === this.getCurrentPlayer().nick && this.noMoves() ) {
 				body.skip = true;
 			}
-
+	
 			return body;
 		}
 	}

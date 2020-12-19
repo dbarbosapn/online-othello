@@ -130,9 +130,11 @@ function doJoin(body, response) {
 		return;
 	}
 
-	let res = controller.joinGame(body.nick);
+	let res = controller.joinGame(body.nick, response);
 
-	response.writeHead(200);
+	if ( res.error == undefined ) 
+		response.writeHead(200);
+		
 	response.end(JSON.stringify(res));
 }
 
@@ -153,7 +155,6 @@ function doLeave(body, response) {
 
 	controller.leaveGame(body.nick);
 
-	response.writeHead(200);
 	response.end(JSON.stringify({}));
 }
 
