@@ -3,9 +3,9 @@ const url = require("url");
 const fs = require("fs");
 const config = require("./config"); 
 const accounts = require("./accounts");
-const ranking = require("./ranking");/*
+const ranking = require("./ranking");
 const controller = require("./gamecontroller");
-const { parse } = require("path"); */
+const { parse } = require("path");
 
 http.createServer((request, response) => {
 	switch (request.method) {
@@ -30,9 +30,9 @@ function doGetRequest(request, response) {
 	const parsedURL = url.parse(request.url, true);
 
 	switch (parsedURL.pathname) {
-/* 		case "/update":
+		case "/update":
 			setupUpdate(parsedURL.query, response);
-			break; */
+			break;
 		// Static content like index.html css js images etc..
 		default:
 			getStaticContent(request, response);
@@ -72,13 +72,19 @@ function parseCommand(pathname, body, response) {
 	switch (pathname) {
 		case "/register":
 			doRegister(body, response);
-			break;/* 
+			break;
 		case "/join":
 			doJoin(body, response);
-			break;*/
+			break;
 		case "/ranking":
 			doRanking(response);
 			break; 
+		case "/notify":
+			doNotify(body, response);
+			break;
+		case "/leave":
+			doLeave(body, response);
+			break;
 		default:
 			response.writeHead(404); // Not Found
 			response.end();
@@ -106,10 +112,8 @@ function doRegister(body, response) {
 function doRanking(response) {
 	response.writeHead(200);
 	response.end(JSON.stringify({ranking: ranking.getRanking() }));
-
-	ranking.saveRanking("abc", true);
 }
-/*
+
 function doJoin(body, response) {
 	if (!body.nick || !body.pass) {
 		response.writeHead(400);
@@ -131,6 +135,26 @@ function doJoin(body, response) {
 	response.end(JSON.stringify(res));
 }
 
+function doLeave(body, response) {
+	if (!body.nick || !body.pass) {
+		response.writeHead(400);
+		response.end(JSON.stringify({ error: "Invalid request body." }));
+		return;
+	}
+
+	if (!accounts.authenticate(body.nick, body.pass)) {
+		response.writeHead(401);
+		response.end(
+			JSON.stringify({ error: "User registered with a different password" })
+		);
+		return;
+	}
+
+	response.writeHead(200);
+	response.end(JSON.stringify({}));
+	controller.leaveGame(body.nick);
+}
+
 function setupUpdate(query, response) {
 	if (!query.nick || !query.game) {
 		response.writeHead(400);
@@ -140,7 +164,11 @@ function setupUpdate(query, response) {
 
 	controller.setupUpdate(query.nick, query.game, response);
 }
- */
+
+function doNotify(body, response) {
+	controller.play(body, response);
+}
+
 function getStaticContent(request, response) {
 	const pathname = getPathname(request);
 

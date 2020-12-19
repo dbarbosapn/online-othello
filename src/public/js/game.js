@@ -340,7 +340,7 @@ class OnlineGame {
 		// Note: Should be careful with encoding
 		if (error === "Not your turn to play")
 			this.ui.outputMessage("info", "Wait for your turn, please.");
-		else if (error.includes("Nenhuma") || error.includes("preenchida"))
+		else if (error.includes("Nenhuma") || error.includes("preenchida") || error == "Invalid move")
 			this.ui.outputMessage("error", "Invalid move");
 		else this.ui.outputMessage("warning", "Something went wrong. Try again");
 	}
