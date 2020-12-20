@@ -55,6 +55,7 @@ class UI {
 		let vsPlayer = document.getElementById("vs-player");
 		let aiDifficultySection = document.getElementById("ai-difficulty-section");
 		let playerShit = document.getElementById("player-shit");
+		let cancelSearch = document.getElementById("cancel-search");
 
 		vsAi.onchange = function () {
 			aiDifficultySection.style.display = "flex";
@@ -102,6 +103,11 @@ class UI {
 				depth,
 				this.configuration.playerColor == 1 ? 2 : 1
 			);
+		};
+
+		cancelSearch.onclick = () => {
+			this.client.leave();
+			this.stopWaiting(false);
 		};
 	}
 

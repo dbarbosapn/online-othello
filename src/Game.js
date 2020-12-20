@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 const Board = require("./Board");
-const dbcontroller = require("./dbcontroller");
-const rank = require("./ranking");
+const ranking = require("./ranking");
 
 module.exports = class Game {
 	constructor() {
@@ -10,15 +9,15 @@ module.exports = class Game {
 		this.players = [];
 		this.board = new Board();
 
-		this.turn = 0;
+		this.timeout = null;
 	}
 
 	addPlayer(player) {
 		this.players.push(player);
-		
-		if ( this.players.length == 2 ) {
+
+		if (this.players.length == 2) {
 			this.broadcastStatus();
-			this.startClock();
+			this._startClock();
 		}
 	}
 
@@ -27,11 +26,15 @@ module.exports = class Game {
 	}
 
 	getPlayerColor(nick) {
-		return this.players[0].nick == nick ? 1: 2
+		return this.players[0].nick == nick ? 1 : 2;
 	}
 
-	validPossition(row, col, nick) {
-		return this.board.validPositionWithRowCol(row, col, this.getPlayerColor(nick));
+	validPosition(row, col, nick) {
+		return this.board.validPositionWithRowCol(
+			row,
+			col,
+			this.getPlayerColor(nick)
+		);
 	}
 
 	getCurrentPlayer() {
@@ -43,16 +46,20 @@ module.exports = class Game {
 	}
 
 	playPiece(row, column, nick) {
-		this.board = this.board.newPieceWithRowColumn(this.getPlayerColor(nick), row, column);
+		this.board = this.board.newPieceWithRowColumn(
+			this.getPlayerColor(nick),
+			row,
+			column
+		);
+		this._startClock();
 
-		if ( !this.board )
-			console.log("Falhou ao ver se a jogada era valida e tentou se jogala");
+		if (!this.board) console.error("Failed to check if the play was valid.");
 
 		this.broadcastStatus();
 	}
 
 	noMoves() {
-		return this.board.noMove(this.getCurrentPlayer());
+		return this.board.noMove(this.board.currentPlayer);
 	}
 
 	skip() {
@@ -60,20 +67,19 @@ module.exports = class Game {
 		this.broadcastStatus();
 	}
 
-	startClock() {
-		this.turn++;
-		let newTurn = this.turn;
-
-		setTimeout(() => {
-			if ( newTurn == this.turn ) {
-				this.getCurrentPlayer().forfeit();
-			}
-		}, 120000);
+	_startClock() {
+		if (this.timeout !== null) clearTimeout(this.timeout);
+		this.timeout = setTimeout(() => {
+			this.getCurrentPlayer().forfeit();
+		}, 2 * 60 * 1000);
 	}
 
 	finishGame(wc) {
-		this.broadcastStatus(wc == "dark" ? this.players[0].nick : this.players[1].nick);
+		this.broadcastStatus(
+			wc == "dark" ? this.players[0].nick : this.players[1].nick
+		);
 	}
+
 	/**
 	 * This function will also automatically start the game, when both players join.
 	 */
@@ -84,42 +90,44 @@ module.exports = class Game {
 	}
 
 	getGameStatus(win = null, player = null) {
-		if (this.playerCount() !== 2) 
-			return {};
-
-		else if ( this.board.gameEnd() ) {
-			let win = this.board.dark > this.board.ligth ? this.players[0].nick : (this.board.dark < this.board.ligth ? this.players[1].nick: null);
+		if (this.playerCount() !== 2) return {};
+		else if (this.board.gameEnd() && player) {
+			let win =
+				this.board.dark > this.board.light
+					? this.players[0].nick
+					: this.board.dark < this.board.light
+					? this.players[1].nick
+					: null;
 			this.hash = null;
-			rank.saveRanking(player.nick, win == player.nick ? 1: 0);
-			return {winner: win}
-		}
-
-		else if ( win ) {
+			ranking.saveRanking(player.nick, win == player.nick ? 1 : 0);
+			return { winner: win };
+		} else if (win && player) {
 			this.hash = null;
-			rank.saveRanking(player.nick, win == player.nick ? 1: 0);
-			return {winner: win};
-		}
-
-		else {
+			ranking.saveRanking(player.nick, win == player.nick ? 1 : 0);
+			return { winner: win };
+		} else {
 			let body = {
-					board: this.board.getMatrix(),
-					turn: this.getCurrentPlayer().nick,
-					count: {
-						dark: this.board.dark,
-						light: this.board.light,
-						empty:
-							this.board.size * this.board.size -
-							this.board.dark -
-							this.board.light,
-					},
-				};
+				board: this.board.getMatrix(),
+				turn: this.getCurrentPlayer().nick,
+				count: {
+					dark: this.board.dark,
+					light: this.board.light,
+					empty:
+						this.board.size * this.board.size -
+						this.board.dark -
+						this.board.light,
+				},
+			};
 
-			if ( !this.board.getPossibleMoves(this.getCurrentPlayer()) ) {
+			if (
+				player &&
+				player.nick === this.getCurrentPlayer().nick &&
+				this.noMoves()
+			) {
 				body.skip = true;
 			}
 
 			return body;
-
 		}
 	}
 };

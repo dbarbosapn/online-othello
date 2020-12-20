@@ -1,29 +1,29 @@
 const http = require("http");
 const url = require("url");
 const fs = require("fs");
-const config = require("./config"); 
+const config = require("./config");
 const accounts = require("./accounts");
 const ranking = require("./ranking");
 const controller = require("./gamecontroller");
-const { parse } = require("path");
 
-http.createServer((request, response) => {
-	switch (request.method) {
-		case "GET":
-			doGetRequest(request, response);
-			break;
+http
+	.createServer((request, response) => {
+		switch (request.method) {
+			case "GET":
+				doGetRequest(request, response);
+				break;
 
-		case "POST":
-			doPostRequest(request, response);
-			break;
+			case "POST":
+				doPostRequest(request, response);
+				break;
 
-		default:
-			response.writeHead(501); // Not Implemented
-			response.end();
-			break;
-	}
-}).listen(config.port);
-
+			default:
+				response.writeHead(501); // Not Implemented
+				response.end();
+				break;
+		}
+	})
+	.listen(config.port);
 console.log(`Server listening on port ${config.port}`);
 
 function doGetRequest(request, response) {
@@ -78,7 +78,7 @@ function parseCommand(pathname, body, response) {
 			break;
 		case "/ranking":
 			doRanking(response);
-			break; 
+			break;
 		case "/notify":
 			doNotify(body, response);
 			break;
@@ -104,14 +104,15 @@ function doRegister(body, response) {
 		response.end("{}");
 	} else {
 		response.writeHead(401);
-		response.end(JSON.stringify({ error: "User registered with a different password" })
+		response.end(
+			JSON.stringify({ error: "User registered with a different password" })
 		);
 	}
 }
 
 function doRanking(response) {
 	response.writeHead(200);
-	response.end(JSON.stringify({ranking: ranking.getRanking() }));
+	response.end(JSON.stringify({ ranking: ranking.getRanking() }));
 }
 
 function doJoin(body, response) {
@@ -150,9 +151,10 @@ function doLeave(body, response) {
 		return;
 	}
 
+	controller.leaveGame(body.nick);
+
 	response.writeHead(200);
 	response.end(JSON.stringify({}));
-	controller.leaveGame(body.nick);
 }
 
 function setupUpdate(query, response) {
@@ -214,11 +216,9 @@ function getMediaType(pathname) {
 	const pos = pathname.lastIndexOf(".");
 	let mediaType;
 
-	if (pos != -1) 
-		mediaType = config.mediaTypes[pathname.substring(pos + 1)];
+	if (pos != -1) mediaType = config.mediaTypes[pathname.substring(pos + 1)];
 
-	if (mediaType == undefined) 
-		mediaType = "test/plain";
+	if (mediaType == undefined) mediaType = "test/plain";
 
 	return mediaType;
 }

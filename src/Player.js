@@ -8,25 +8,23 @@ module.exports = class Player {
 	}
 
 	inGame() {
-		return this.game !== null;
+		return this.game !== null && this.game.players.length === 2;
 	}
 
 	joinGame(game, first) {
 		this.game = game;
-		this.color = first ? "dark": "ligth";
+		this.color = first ? "dark" : "light";
 		game.addPlayer(this);
 	}
 
 	forfeit() {
-		if (this.inGame()) {
-			this.game.finishGame(this._oppositeColor());
-		}
+		if (this.inGame()) this.game.finishGame(this._oppositeColor());
 
 		this.game = null;
 	}
 
 	_oppositeColor() {
-		return this.color === "dark" ? "white" : "dark";
+		return this.color === "dark" ? "light" : "dark";
 	}
 
 	setUpdateResponse(response) {
