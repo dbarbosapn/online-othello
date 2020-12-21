@@ -1,5 +1,5 @@
 module.exports = {
-	port: 8135,
+	port: 8134,
 	mediaTypes: {
 		txt: "text/plain",
 		html: "text/html",
