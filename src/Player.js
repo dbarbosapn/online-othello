@@ -37,7 +37,7 @@ module.exports = class Player {
 
 	// This user will forfeit its game
 	forfeit() {
-		this.game.forfeit(this);
+		if (this.game) this.game.forfeit(this);
 	}
 
 	// Return a string with the oponnents color
