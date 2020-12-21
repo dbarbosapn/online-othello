@@ -56,7 +56,7 @@ module.exports = class Board {
 		let middle = this.size / 2;
 		let point = new Point(middle - 1, middle - 1);
 
-		// Test Skip. Leave this here but comment it. Skips are so fk hard to test
+		// Test Skip
 		/* for ( let i = 0; i<=7; i++ ) {
 			for( let j = 0; j<=7; j++ ) {
 				if ( !(i==0 && j==0) && !(i==0 && j==7) )

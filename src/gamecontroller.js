@@ -58,7 +58,6 @@ function play(data, response) {
 		// the previous call, has won or lost then we call leaveGame
 		// with the winner as the argument
 		if (players[data.nick].game.gameIsFinished()) {
-			console.log("call " + players[data.nick].game.gameIsFinished());
 			this.leaveGame(data.nick, players[data.nick].game.getWinner());
 		}
 	}
@@ -158,8 +157,6 @@ function leaveGame(nick, won = null) {
 
 	// won => UserName | tie
 	else if (won != null) {
-		console.log(won);
-		console.log(players[nick].game.board.toString());
 		players[nick].game.broadcastStatus(won);
 
 		// Gets the players in nick's game

@@ -482,7 +482,6 @@ class UI {
 		document.getElementById("confirm-button").onclick = () => {
 			this._hidePanel(5, true);
 			this.client.forfeit();
-			console.log("passed");
 		};
 
 		this._showPanel(5, true);

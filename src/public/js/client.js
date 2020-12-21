@@ -8,7 +8,7 @@ class Client {
 
 		/* Server name */
 		//this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
-		this.serverURL = "http://localhost:8035/";
+		this.serverURL = "http://localhost:8135/";
 
 		/* Match Id */
 		this.matchId = null;
@@ -79,7 +79,6 @@ class Client {
 				} else {
 					this.matchId = res.game;
 					this.color = res.color;
-					console.log(this.matchId);
 					this.startListening();
 				}
 			})
@@ -103,8 +102,6 @@ class Client {
 
 		this.eventSource.onmessage = (event) => {
 			const data = JSON.parse(event.data);
-
-			console.log(data);
 
 			if ("winner" in data) {
 				this.finishGame(data.winner);

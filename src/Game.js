@@ -52,8 +52,6 @@ module.exports = class Game {
 		let dark = this.board.dark;
 		let ligth = this.board.light;
 
-		console.log(dark + " " + ligth);
-
 		return dark > ligth
 			? this.players[0].nick
 			: ligth > dark
@@ -133,7 +131,6 @@ module.exports = class Game {
 		// Game has a winner
 		else if (won != null) {
 			ranking.saveRanking(player.nick, player.nick == won.nick ? 1 : 0);
-			console.log(player.nick + " passou");
 			return { winner: won };
 		}
 

@@ -292,8 +292,6 @@ class OnlineGame {
 	}
 
 	update(play, board, skip) {
-		console.log("Updating board...");
-
 		this.currentBoard.updateWithMatrix(board);
 		this.currentBoard.currentPlayer = play
 			? this.playerColor
