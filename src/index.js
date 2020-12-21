@@ -132,9 +132,8 @@ function doJoin(body, response) {
 
 	let res = controller.joinGame(body.nick, response);
 
-	if ( res.error == undefined ) 
-		response.writeHead(200);
-		
+	if (res.error == undefined) response.writeHead(200);
+
 	response.end(JSON.stringify(res));
 }
 

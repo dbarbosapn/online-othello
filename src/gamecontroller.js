@@ -11,39 +11,30 @@ var players = {};
 // Function controls how join game command is processed
 // and return the reponse body
 function joinGame(nick, response) {
-	// If player is not currently on our player list i.e players that we have a track 
-	// record of trying to join a game
-	if ( !players[nick] ) 
-		players[nick] = new Player(nick, db.read("users", nick));
-
-	// If player is being tracked and its game reference (player[nick].game) 
-	// is different than null, this means that the same player is trying 
-	// to play multiple games at once. We block this
-	else if ( players[nick].game !== null ) {
+	// Check if the player is not currently playing
+	if (!players[nick]) players[nick] = new Player(nick, db.read("users", nick));
+	else if (players[nick].game !== null) {
 		response.writeHead(400);
-		return {error: "User already in game"};
+		return { error: "User already in game" };
 	}
 
 	// Ok head
 	response.writeHead(200);
 
-	// If no player is waiting for a match ip then the new request
-	// will be put on the waiting list
+	// Check if there is already a player waiting
 	if (!waitingPlayer) {
 		players[nick].joinGame(new Game(), true);
 		waitingPlayer = players[nick];
 		startTimeout();
-	} 
-	// otherwise, we shall connect both players through and clear
-	// the waiting list
-	else {
+	} else {
 		players[nick].joinGame(waitingPlayer.game, false);
 		waitingPlayer = null;
 		stopTimeout();
 	}
 
-	return {game: players[nick].game.hash, color: players[nick].color};
+	return { game: players[nick].game.hash, color: players[nick].color };
 }
+
 // Function manages a notify i.e play piece/skip
 // the response body will be writen in this function instead of returning something
 // and will trigger an SSE
@@ -51,22 +42,27 @@ function play(data, response) {
 	response.writeHead(200);
 
 	// If play is valid
-	if (checkValidUser(data.nick, data.pass, response) &&
+	if (
+		checkValidUser(data.nick, data.pass, response) &&
 		checkValidGame(data.nick, data.game, response) &&
 		checkValidMove(data.nick, data.move, response)
 	) {
 		response.end(JSON.stringify({}));
-		players[data.nick].game.playPiece(data.move.row, data.move.column, data.nick);
+		players[data.nick].game.playPiece(
+			data.move.row,
+			data.move.column,
+			data.nick
+		);
 
-		// If some player, calculated implicitly with 
+		// If some player, calculated implicitly with
 		// the previous call, has won or lost then we call leaveGame
 		// with the winner as the argument
-		if ( players[data.nick].game.gameIsFinished() ) {
+		if (players[data.nick].game.gameIsFinished()) {
 			console.log("call " + players[data.nick].game.gameIsFinished());
 			this.leaveGame(data.nick, players[data.nick].game.getWinner());
 		}
-	} 
-	
+	}
+
 	// Otherwise send error code, that was obtained in the previous
 	// conditions checks. It does not call a SSE in this case
 	else {
@@ -79,14 +75,10 @@ function checkValidUser(nick, pass, response) {
 	if (!nick || !pass) {
 		response.write(JSON.stringify({ error: "Invalid request body." }));
 		return false;
-	} 
-	
-	else if (!players[nick]) {
+	} else if (!players[nick]) {
 		response.write(JSON.stringify({ error: "Invalid request body." }));
 		return false;
-	} 
-	
-	else {
+	} else {
 		hashPass = crypto.createHash("md5").update(pass).digest("hex");
 
 		if (hashPass != players[nick].pass) {
@@ -120,42 +112,30 @@ function checkValidMove(nick, move, response) {
 	}
 
 	// move can be null, BUT only if the current player has no moves
-	else if (move === null && p.noMoves() ) {
+	else if (move === null && p.noMoves()) {
 		response.write(JSON.stringify({}));
 		p.skip();
 		return false;
-	} 
-	
-	else if (move.row == undefined) {
+	} else if (move.row == undefined) {
 		response.write(JSON.stringify({ error: "Move lacks property 'row'" }));
 		return false;
-	} 
-	
-	else if (move.column == undefined) {
+	} else if (move.column == undefined) {
 		response.write(JSON.stringify({ error: "Move lacks property 'column'" }));
 		return false;
-	} 
-	
-	else if (move.row > 7 || move.row < 0) {
+	} else if (move.row > 7 || move.row < 0) {
 		response.write(
 			JSON.stringify({ error: "Row should be an integer between 0 and 7" })
 		);
 		return false;
-	} 
-	
-	else if (move.column > 7 || move.column < 0) {
+	} else if (move.column > 7 || move.column < 0) {
 		response.write(
 			JSON.stringify({ error: "Column should be an integer between 0 and 7" })
 		);
 		return false;
-	} 
-	
-	else if ( !p.isTurn() ) {
+	} else if (!p.isTurn()) {
 		response.write(JSON.stringify({ error: "Not your turn to play" }));
 		return false;
-	} 
-	
-	else if ( !p.game.validPosition(move.row, move.column, nick) ) {
+	} else if (!p.game.validPosition(move.row, move.column, nick)) {
 		response.write(JSON.stringify({ error: "Invalid move" }));
 		return false;
 	}
@@ -166,14 +146,18 @@ function checkValidMove(nick, move, response) {
 // Function manages how to leave a game
 function leaveGame(nick, won = null) {
 	// Checks if player is currently in game or lobby
-	if ( players[nick] && waitingPlayer && players[nick].nick === waitingPlayer.nick ) {
+	if (
+		players[nick] &&
+		waitingPlayer &&
+		players[nick].nick === waitingPlayer.nick
+	) {
 		waitingPlayer.game = null;
 		waitingPlayer = null;
 		stopTimeout();
-	} 
+	}
 
 	// won => UserName | tie
-	else if ( won != null ) {
+	else if (won != null) {
 		console.log(won);
 		console.log(players[nick].game.board.toString());
 		players[nick].game.broadcastStatus(won);
@@ -182,11 +166,13 @@ function leaveGame(nick, won = null) {
 		let tempArr = players[nick].game.getPlayers();
 
 		// Closes the game for all the player in nick's game
-		tempArr.forEach(elem => { elem.game = null;});
+		tempArr.forEach((elem) => {
+			elem.game = null;
+		});
 	}
 
 	// Player is in game
-	else if ( players[nick] ) {
+	else if (players[nick]) {
 		// Gets the players in nick's game
 		let tempArr = players[nick].game.getPlayers();
 
@@ -194,11 +180,11 @@ function leaveGame(nick, won = null) {
 		players[nick].forfeit();
 
 		// Closes the game for all the player in nick's game
-		tempArr.forEach(elem => { elem.game = null;});
-	}
-
-	else {
-		console.log("Player not in trackingList " + nick);
+		tempArr.forEach((elem) => {
+			elem.game = null;
+		});
+	} else {
+		console.log("Player not in a game: " + nick);
 	}
 }
 
@@ -217,7 +203,7 @@ function startTimeout() {
 	}, 2 * 60 * 1000);
 }
 
-// Deals with a SSE. 
+// Deals with a SSE.
 function setupUpdate(nick, hash, response) {
 	response.writeHead(200, {
 		"Content-Type": "text/event-stream",

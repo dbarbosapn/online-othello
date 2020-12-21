@@ -12,10 +12,10 @@ function save(type, key, value) {
 }
 
 // key = null if you want all the data base, otherwise you need to specify the user
-function read(type, key=null) {
+function read(type, key = null) {
 	let rawData = fs.readFileSync(config.database[type]);
 	let data = JSON.parse(rawData);
-	return type == "ranking" ? data.ranking : (key == null ? data : data[key]);
+	return type == "ranking" ? data.ranking : key == null ? data : data[key];
 }
 
 module.exports = { save, read };
