@@ -130,7 +130,7 @@ module.exports = class Game {
 		if (this.playerCount() !== 2) return {};
 		// Game has a winner
 		else if (won != null) {
-			ranking.saveRanking(player.nick, player.nick == won.nick ? 1 : 0);
+			ranking.saveRanking(player.nick, player.nick === won.nick ? true : false);
 			return { winner: won };
 		}
 

@@ -8,7 +8,7 @@ class Client {
 
 		/* Server name */
 		//this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8008/";
-		this.serverURL = "http://localhost:8134/";
+		this.serverURL = "http://twserver.alunos.dcc.fc.up.pt:8134/";
 
 		/* Match Id */
 		this.matchId = null;
